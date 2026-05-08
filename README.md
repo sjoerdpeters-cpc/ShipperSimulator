@@ -56,6 +56,8 @@ MVP 3 voegt de eerste vloot- en tijdsimulatie toe:
 - Na aankoop wordt de kaart beeldvullend
 - Vlootacties: bunkeren, route kiezen en laten liggen
 - Tijdcontrols: pauze, 1 dag/sec en 2 dagen/sec
+- Na routekeuze kan het schip starten met varen
+- De kaart toont een mock-vaarroute over waterwegcorridors en simuleert de schippositie
 
 ## Lokale ontwikkeling
 

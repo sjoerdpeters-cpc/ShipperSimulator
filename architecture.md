@@ -60,7 +60,7 @@ MapLibre GL wordt de kaartlaag. De Nederlandse waterkaart volgt na MVP 1 op basi
 
 ## 9. Route-engine
 
-De route-engine blijft los van de kaart. Eerst retourneert die routes uit mockdata. Later kan deze waterwegen, bruggen, sluizen, diepgang en wachttijden meenemen.
+De route-engine blijft los van de kaart. Eerst retourneert die routes uit mockdata met vereenvoudigde vaarwegcorridors tussen havens. Later kan deze echte waterwegen, bruggen, sluizen, diepgang en wachttijden meenemen.
 
 ## 10. Mobiel/PWA
 

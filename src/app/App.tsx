@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { ports } from '../data/ports';
 import { vessels } from '../data/vessels';
 import { PortMap } from '../domains/map/PortMap';
+import { getCoordinateAtProgress } from '../domains/route/waterwayRoutes';
 import type { FleetVesselStatus } from '../domains/vessel/types';
 import { useGameStore } from '../store/gameStore';
 
@@ -24,6 +25,10 @@ function getStatusLabel(status: FleetVesselStatus) {
     return 'Route gepland';
   }
 
+  if (status === 'sailing') {
+    return 'Onderweg';
+  }
+
   return 'Ligt stil';
 }
 
@@ -41,6 +46,7 @@ export function App() {
   const setActiveFleetVessel = useGameStore((state) => state.setActiveFleetVessel);
   const bunkerActiveVessel = useGameStore((state) => state.bunkerActiveVessel);
   const planRouteForActiveVessel = useGameStore((state) => state.planRouteForActiveVessel);
+  const startSailingActiveVessel = useGameStore((state) => state.startSailingActiveVessel);
   const idleActiveVessel = useGameStore((state) => state.idleActiveVessel);
   const setTimeScale = useGameStore((state) => state.setTimeScale);
   const tick = useGameStore((state) => state.tick);
@@ -53,6 +59,15 @@ export function App() {
   const destinationPort = ports.find(
     (candidate) => candidate.id === activeFleetVessel?.destinationPortId,
   );
+  const voyageProgress =
+    activeFleetVessel?.voyage && activeFleetVessel.voyage.durationDays > 0
+      ? activeFleetVessel.voyage.progressDays / activeFleetVessel.voyage.durationDays
+      : 0;
+  const shipCoordinate = activeFleetVessel?.voyage
+    ? getCoordinateAtProgress(activeFleetVessel.voyage.routeCoordinates, voyageProgress)
+    : activePort.coordinates;
+  const canStartSailing =
+    activeFleetVessel?.status === 'route-planned' && activeFleetVessel.destinationPortId !== null;
   const canBuy = balanceEuros >= selectedVessel.purchasePriceEuros && hasSelectedPort;
 
   useEffect(() => {
@@ -70,7 +85,13 @@ export function App() {
   if (activeFleetVessel) {
     return (
       <main className="map-game-shell">
-        <PortMap fullscreen port={activePort} vessel={activeFleetVessel.vessel} />
+        <PortMap
+          fullscreen
+          port={activePort}
+          routeCoordinates={activeFleetVessel.voyage?.routeCoordinates}
+          shipCoordinate={shipCoordinate}
+          vessel={activeFleetVessel.vessel}
+        />
 
         <section className="game-hud top-hud" aria-label="Spelstatus">
           <div>
@@ -123,6 +144,21 @@ export function App() {
                 <dt>Status</dt>
                 <dd>{getStatusLabel(activeFleetVessel.status)}</dd>
               </div>
+              {activeFleetVessel.voyage ? (
+                <>
+                  <div>
+                    <dt>Afstand</dt>
+                    <dd>{activeFleetVessel.voyage.distanceKm} km</dd>
+                  </div>
+                  <div>
+                    <dt>Voortgang</dt>
+                    <dd>
+                      Dag {activeFleetVessel.voyage.progressDays} /{' '}
+                      {activeFleetVessel.voyage.durationDays}
+                    </dd>
+                  </div>
+                </>
+              ) : null}
               <div>
                 <dt>Brandstof</dt>
                 <dd>
@@ -145,6 +181,7 @@ export function App() {
             <label>
               Route kiezen
               <select
+                disabled={activeFleetVessel.status === 'sailing'}
                 onChange={(event) => planRouteForActiveVessel(event.target.value)}
                 value={activeFleetVessel.destinationPortId ?? ''}
               >
@@ -160,6 +197,9 @@ export function App() {
                   ))}
               </select>
             </label>
+            <button disabled={!canStartSailing} type="button" onClick={startSailingActiveVessel}>
+              Start varen
+            </button>
             <button type="button" onClick={idleActiveVessel}>
               Laat liggen
             </button>

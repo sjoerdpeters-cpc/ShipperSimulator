@@ -18,7 +18,16 @@ export type Vessel = {
   fuelCapacityLiters: number;
 };
 
-export type FleetVesselStatus = 'idle' | 'bunkering' | 'route-planned';
+export type Voyage = {
+  originPortId: string;
+  destinationPortId: string;
+  routeCoordinates: [longitude: number, latitude: number][];
+  distanceKm: number;
+  durationDays: number;
+  progressDays: number;
+};
+
+export type FleetVesselStatus = 'idle' | 'bunkering' | 'route-planned' | 'sailing';
 
 export type FleetVessel = {
   id: string;
@@ -28,4 +37,5 @@ export type FleetVessel = {
   destinationPortId: string | null;
   fuelLiters: number;
   status: FleetVesselStatus;
+  voyage: Voyage | null;
 };

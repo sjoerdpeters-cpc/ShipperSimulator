@@ -340,6 +340,24 @@ dd {
   content: '';
 }
 
+.destination-marker {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #ffffff;
+  border-radius: 50% 50% 50% 0;
+  background: var(--accent);
+  box-shadow: 0 10px 24px rgb(0 0 0 / 28%);
+  transform: rotate(-45deg);
+}
+
+.destination-marker::after {
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  background: #ffffff;
+  content: '';
+}
+
 .map-game-shell {
   position: relative;
   min-height: 100vh;

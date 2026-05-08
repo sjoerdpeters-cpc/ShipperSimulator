@@ -1,6 +1,8 @@
 import { create } from 'zustand';
+import { ports } from '../data/ports';
 import type { Port } from '../domains/port/types';
 import type { RoutePlan } from '../domains/route/types';
+import { buildWaterwayRoute } from '../domains/route/waterwayRoutes';
 import { advanceSimulation, createInitialSimulationState } from '../domains/simulation/simulationEngine';
 import type { SimulationState } from '../domains/simulation/types';
 import type { FleetVessel, Vessel } from '../domains/vessel/types';
@@ -23,6 +25,7 @@ type GameStore = {
   setActiveFleetVessel: (fleetVesselId: string) => void;
   bunkerActiveVessel: (port: Port) => void;
   planRouteForActiveVessel: (destinationPortId: string) => void;
+  startSailingActiveVessel: () => void;
   idleActiveVessel: () => void;
   setTimeScale: (timeScale: 0 | 1 | 2) => void;
   setRoute: (route: RoutePlan) => void;
@@ -56,6 +59,7 @@ export const useGameStore = create<GameStore>((set) => ({
         destinationPortId: null,
         fuelLiters: Math.round(state.vessel.fuelCapacityLiters * 0.35),
         status: 'idle',
+        voyage: null,
       };
 
       didBuy = true;
@@ -109,10 +113,53 @@ export const useGameStore = create<GameStore>((set) => ({
               ...fleetVessel,
               destinationPortId,
               status: 'route-planned',
+              voyage: null,
             }
           : fleetVessel,
       ),
     })),
+  startSailingActiveVessel: () =>
+    set((state) => {
+      const active = state.fleet.find((fleetVessel) => fleetVessel.id === state.activeFleetVesselId);
+
+      if (!active?.destinationPortId) {
+        return state;
+      }
+
+      const origin = ports.find((candidate) => candidate.id === active.currentPortId);
+      const destination = ports.find((candidate) => candidate.id === active.destinationPortId);
+
+      if (!origin || !destination) {
+        return state;
+      }
+
+      const route = buildWaterwayRoute(origin, destination, active.vessel.maxSpeedKmh);
+      const estimatedFuelLiters = Math.round(route.distanceKm * (active.vessel.costPerKmEuros / 10));
+
+      if (active.fuelLiters < estimatedFuelLiters) {
+        return state;
+      }
+
+      return {
+        fleet: state.fleet.map((fleetVessel) =>
+          fleetVessel.id === active.id
+            ? {
+                ...fleetVessel,
+                fuelLiters: fleetVessel.fuelLiters - estimatedFuelLiters,
+                status: 'sailing',
+                voyage: {
+                  originPortId: origin.id,
+                  destinationPortId: destination.id,
+                  routeCoordinates: route.routeCoordinates,
+                  distanceKm: route.distanceKm,
+                  durationDays: route.durationDays,
+                  progressDays: 0,
+                },
+              }
+            : fleetVessel,
+        ),
+      };
+    }),
   idleActiveVessel: () =>
     set((state) => ({
       fleet: state.fleet.map((fleetVessel) =>
@@ -121,6 +168,7 @@ export const useGameStore = create<GameStore>((set) => ({
               ...fleetVessel,
               destinationPortId: null,
               status: 'idle',
+              voyage: null,
             }
           : fleetVessel,
       ),
@@ -130,5 +178,33 @@ export const useGameStore = create<GameStore>((set) => ({
   tick: (days = 1) =>
     set((state) => ({
       simulation: advanceSimulation(state.simulation, days),
+      fleet: state.fleet.map((fleetVessel) => {
+        if (fleetVessel.status !== 'sailing' || !fleetVessel.voyage) {
+          return fleetVessel;
+        }
+
+        const progressDays = Math.min(
+          fleetVessel.voyage.durationDays,
+          fleetVessel.voyage.progressDays + Math.max(0, Math.floor(days)),
+        );
+
+        if (progressDays >= fleetVessel.voyage.durationDays) {
+          return {
+            ...fleetVessel,
+            currentPortId: fleetVessel.voyage.destinationPortId,
+            destinationPortId: null,
+            status: 'idle',
+            voyage: null,
+          };
+        }
+
+        return {
+          ...fleetVessel,
+          voyage: {
+            ...fleetVessel.voyage,
+            progressDays,
+          },
+        };
+      }),
     })),
 }));
