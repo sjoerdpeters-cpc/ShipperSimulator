@@ -132,6 +132,124 @@ dd {
   padding: 32px;
 }
 
+.selection-note {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.vessel-workspace {
+  grid-template-rows: auto 1fr;
+  overflow: auto;
+}
+
+.vessel-hero {
+  display: grid;
+  grid-template-columns: minmax(360px, 1.2fr) minmax(260px, 0.8fr);
+  min-height: 320px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.vessel-hero img {
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  object-fit: cover;
+}
+
+.vessel-hero div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 36px;
+}
+
+.vessel-hero span,
+.vessel-card span {
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.vessel-hero h2 {
+  margin: 10px 0 14px;
+  font-size: 2rem;
+  line-height: 1.1;
+}
+
+.vessel-hero p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.vessel-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.vessel-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.vessel-card[data-selected='true'] {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgb(23 107 120 / 16%);
+}
+
+.vessel-card img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.vessel-card-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px;
+}
+
+.vessel-card h2 {
+  margin: 8px 0 10px;
+  font-size: 1.05rem;
+}
+
+.vessel-card p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.94rem;
+  line-height: 1.5;
+}
+
+.vessel-stats {
+  gap: 10px;
+}
+
+.vessel-stats div {
+  padding-top: 10px;
+  border-top: 1px solid var(--surface-muted);
+}
+
+.vessel-stats dt,
+.vessel-stats dd {
+  font-size: 0.88rem;
+}
+
 .map-placeholder {
   display: grid;
   place-items: center;
@@ -192,5 +310,19 @@ dd {
 
   .module-grid {
     grid-template-columns: 1fr;
+  }
+
+  .vessel-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .vessel-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 861px) and (max-width: 1280px) {
+  .vessel-grid {
+    grid-template-columns: repeat(2, minmax(240px, 1fr));
   }
 }

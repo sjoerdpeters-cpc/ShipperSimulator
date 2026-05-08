@@ -54,7 +54,7 @@ De simulatie werkt met discrete ticks. Een tick kan later worden vertaald naar m
 
 ## 8. Kaartlaag
 
-MapLibre GL wordt de kaartlaag. MVP 1 start met een Nederlandse waterkaart op basis van mock- of statische data. Echte kaartdata wordt later via adapters toegevoegd.
+MapLibre GL wordt de kaartlaag. De Nederlandse waterkaart volgt na MVP 1 op basis van mock- of statische data. Echte kaartdata wordt later via adapters toegevoegd.
 
 ## 9. Route-engine
 
@@ -67,8 +67,9 @@ De webapp is desktop-first, maar houdt rekening met latere PWA/mobile uitbreidin
 ## 11. Roadmap
 
 - MVP 0: technische basis, deployment, architectuur en kwaliteitschecks.
-- MVP 1: Nederlandse waterkaart.
-- MVP 2: schip kiezen, route kiezen en simulatie in realistisch aantal dagen.
+- MVP 1: startschip kiezen met configureerbare scheepsdata en lokale foto's.
+- MVP 2: Nederlandse waterkaart.
+- MVP 3: schip en route kiezen met simulatie in realistisch aantal dagen.
 - MVP 3: havens en vrachtopdrachten.
 - MVP 4: bruggen, sluizen en wachttijden.
 - MVP 5: geld, brandstof, onderhoud en planning.

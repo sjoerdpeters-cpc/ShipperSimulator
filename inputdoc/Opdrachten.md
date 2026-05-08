@@ -2,18 +2,34 @@
 
 MVP 0: Zet de app/applicatie technisch op en zorg voor deploy processen
 ---
-MVP 1: Waterkaart Nederland
+
+MVP 1: Kies een startschip:  
+
+Containerschip: Vervoert zeecontainers tussen o.a. Rotterdam, Duitsland en het achterland.
+
+Tankschip: Vervoert vloeistoffen zoals olie, chemicaliën of brandstoffen.
+
+Drogeladingschip / vrachtschip: Vervoert bulkgoederen zoals zand, grind, kolen, veevoer of staal.
+
+Duwboot: Een krachtige boot die één of meerdere bakken voortduwt, vaak met bulkgoederen.
+
+Voeg een foto toe en zorg dat deze allemaal andere eigenschappen hebben: vaarsnelheid - inhoud - kosten per km - en stop deze in een configureerbaar los databestand
+
+
+
+
+MVP x Waterkaart Nederland
 ---
-MVP 2: Schip + route kiezen + simulatie in realistisch aantal dagen
+MVP x: Schip + route kiezen + simulatie in realistisch aantal dagen
 ---
-MVP 3: Havens + vrachtopdrachten
+MVP x: Havens + vrachtopdrachten
 ---
-MVP 4: Bruggen, sluizen en wachttijden
+MVP x: Bruggen, sluizen en wachttijden
 ---
-MVP 5: Geld, brandstof, onderhoud en planning
+MVP x: Geld, brandstof, onderhoud en planning
 ---
-MVP 6: Realistische binnenvaart-economie
+MVP x: Realistische binnenvaart-economie
 ---
-MVP 7: 3D cockpit / havenbeelden / fotorealistische locaties
+MVP x: 3D cockpit / havenbeelden / fotorealistische locaties
 ---
 

@@ -1,7 +1,7 @@
 {
   "name": "shipper-simulator",
   "private": true,
-  "version": "0.0.0-mvp0",
+  "version": "0.1.0-mvp1",
   "type": "module",
   "description": "Shipper Simulator - desktop-first binnenvaart simulator voor Nederland.",
   "scripts": {

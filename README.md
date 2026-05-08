@@ -15,6 +15,17 @@ MVP 0 zet de technische basis neer:
 - Route-engine los van MapView
 - Build-, lint- en deployconfiguratie
 
+## MVP 1
+
+MVP 1 voegt de keuze voor een startschip toe:
+
+- Containerschip
+- Tankschip
+- Drogeladingschip / vrachtschip
+- Duwboot
+
+De scheepsdata staat configureerbaar in `src/data/vessels.ts`. Lokale foto's staan in `public/assets/vessels/`.
+
 ## Lokale ontwikkeling
 
 ```bash

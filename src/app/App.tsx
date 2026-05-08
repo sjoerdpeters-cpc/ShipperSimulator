@@ -1,79 +1,90 @@
-import { useMemo } from 'react';
-import { getInitialRoutePlan } from '../domains/route/routeEngine';
-import { advanceSimulation } from '../domains/simulation/simulationEngine';
-import { mockVessels } from '../data/mockVessels';
+import { vessels } from '../data/vessels';
 import { useGameStore } from '../store/gameStore';
 
 export function App() {
   const vessel = useGameStore((state) => state.vessel);
-  const simulation = useGameStore((state) => state.simulation);
   const setVessel = useGameStore((state) => state.setVessel);
-  const setRoute = useGameStore((state) => state.setRoute);
-  const tick = useGameStore((state) => state.tick);
-
-  const routePreview = useMemo(() => getInitialRoutePlan(), []);
-  const nextSimulation = advanceSimulation(simulation, 1);
+  const selectedVessel = vessel ?? vessels[0];
 
   return (
     <main className="app-shell">
       <aside className="sidebar" aria-label="Game status">
-        <p className="eyebrow">MVP 0</p>
+        <p className="eyebrow">MVP 1</p>
         <h1>Shipper Simulator</h1>
         <p className="intro">
-          Technische basis voor een desktop-first binnenvaart simulator met losse kaart-,
-          route- en simulatielagen.
+          Kies je startschip. Elk type heeft eigen snelheid, capaciteit en kosten per
+          kilometer.
         </p>
 
         <section className="status-panel" aria-labelledby="status-title">
-          <h2 id="status-title">Status</h2>
+          <h2 id="status-title">Geselecteerd schip</h2>
           <dl>
             <div>
-              <dt>Schip</dt>
-              <dd>{vessel?.name ?? 'Nog niet gekozen'}</dd>
+              <dt>Type</dt>
+              <dd>{selectedVessel.label}</dd>
             </div>
             <div>
-              <dt>Simulatiedag</dt>
-              <dd>{simulation.day}</dd>
+              <dt>Snelheid</dt>
+              <dd>{selectedVessel.maxSpeedKmh} km/u</dd>
             </div>
             <div>
-              <dt>Volgende tick</dt>
-              <dd>Dag {nextSimulation.day}</dd>
+              <dt>Inhoud</dt>
+              <dd>{selectedVessel.capacityLabel}</dd>
+            </div>
+            <div>
+              <dt>Kosten</dt>
+              <dd>EUR {selectedVessel.costPerKmEuros}/km</dd>
             </div>
           </dl>
         </section>
 
-        <div className="actions">
-          <button type="button" onClick={() => setVessel(mockVessels[0])}>
-            Kies startschip
-          </button>
-          <button type="button" onClick={() => setRoute(routePreview)}>
-            Laad mockroute
-          </button>
-          <button type="button" onClick={() => tick(1)}>
-            Simuleer dag
-          </button>
-        </div>
+        <p className="selection-note">{selectedVessel.description}</p>
       </aside>
 
-      <section className="workspace" aria-label="Simulator werkruimte">
-        <div className="map-placeholder">
-          <span>MapLibre kaartlaag</span>
-          <strong>Nederlandse waterkaart volgt in MVP 1</strong>
+      <section className="workspace vessel-workspace" aria-label="Startschip kiezen">
+        <div className="vessel-hero">
+          <img src={selectedVessel.image.src} alt={selectedVessel.image.alt} />
+          <div>
+            <span>{selectedVessel.label}</span>
+            <h2>{selectedVessel.name}</h2>
+            <p>{selectedVessel.description}</p>
+          </div>
         </div>
 
-        <div className="module-grid">
-          <article>
-            <h2>Route-engine</h2>
-            <p>{routePreview.origin.name} naar {routePreview.destination.name}</p>
-          </article>
-          <article>
-            <h2>Game state</h2>
-            <p>Zustand store actief met schip, route en simulatietijd.</p>
-          </article>
-          <article>
-            <h2>Data</h2>
-            <p>Mockdata eerst, echte kaart- en vaarwegdata later.</p>
-          </article>
+        <div className="vessel-grid">
+          {vessels.map((candidate) => {
+            const isSelected = candidate.id === selectedVessel.id;
+
+            return (
+              <article className="vessel-card" data-selected={isSelected} key={candidate.id}>
+                <img src={candidate.image.src} alt={candidate.image.alt} />
+                <div className="vessel-card-content">
+                  <div>
+                    <span>{candidate.label}</span>
+                    <h2>{candidate.name}</h2>
+                    <p>{candidate.description}</p>
+                  </div>
+                  <dl className="vessel-stats">
+                    <div>
+                      <dt>Vaarsnelheid</dt>
+                      <dd>{candidate.maxSpeedKmh} km/u</dd>
+                    </div>
+                    <div>
+                      <dt>Inhoud</dt>
+                      <dd>{candidate.capacityLabel}</dd>
+                    </div>
+                    <div>
+                      <dt>Kosten per km</dt>
+                      <dd>EUR {candidate.costPerKmEuros}</dd>
+                    </div>
+                  </dl>
+                  <button type="button" onClick={() => setVessel(candidate)}>
+                    {isSelected ? 'Gekozen' : 'Kies schip'}
+                  </button>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
     </main>
