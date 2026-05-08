@@ -416,10 +416,15 @@ dd {
   box-shadow: 0 0 0 3px rgb(23 107 120 / 16%);
 }
 
-.vessel-card img,
-.port-card img {
+.vessel-card img {
   width: 100%;
   aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.port-card img {
+  width: 100%;
+  aspect-ratio: 8 / 3;
   object-fit: cover;
 }
 
