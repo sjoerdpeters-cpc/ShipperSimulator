@@ -241,6 +241,40 @@ export function App() {
   if (activeFleetVessel) {
     return (
       <main className="map-game-shell">
+        <header className="top-app-bar" aria-label="Hoofdnavigatie">
+          <div className="top-brand">
+            <strong>Dutch Waterways</strong>
+            <nav aria-label="Modules">
+              <span>Overview</span>
+              <span data-active="true">Fleet</span>
+              <span>Contracts</span>
+              <span>Ports</span>
+              <span>Finances</span>
+            </nav>
+          </div>
+          <div className="top-status">
+            <span>Day {simulation.day}</span>
+            <span>{timeScale === 0 ? 'Paused' : `${timeScale}x simulation`}</span>
+          </div>
+        </header>
+
+        <aside className="side-nav" aria-label="Bedrijf en secties">
+          <div className="company-block">
+            <div className="company-mark">SW</div>
+            <div>
+              <strong>Shipper Works</strong>
+              <span>{activePort.name}, NL</span>
+            </div>
+          </div>
+          <nav>
+            <span data-active="true">Fleet</span>
+            <span>Logistics</span>
+            <span>Infrastructure</span>
+            <span>Financials</span>
+            <span>Company</span>
+          </nav>
+        </aside>
+
         <PortMap
           fullscreen
           port={activePort}
@@ -266,8 +300,8 @@ export function App() {
 
         <aside className="fleet-panel" aria-label="Vlootbeheer">
           <div className="panel-heading">
-            <span>MVP 3</span>
-            <h1>Vloot</h1>
+            <span>Fleet Management</span>
+            <h1>{activeFleetVessel.vessel.name}</h1>
           </div>
 
           <div className="fleet-list">

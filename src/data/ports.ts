@@ -13,9 +13,8 @@ export const ports: Port[] = [
     image: {
       src: '/assets/ports/rotterdam.jpg',
       alt: 'Havenbeeld in Rotterdam',
-      credit: 'Wikimedia Commons',
-      sourceUrl:
-        'https://commons.wikimedia.org/wiki/File:AIDAperla_in_Rotterdam_-_September_2019.jpg',
+      credit: 'Lokale asset',
+      sourceUrl: '/assets/ports/rotterdam.jpg',
     },
   },
   {
@@ -30,9 +29,8 @@ export const ports: Port[] = [
     image: {
       src: '/assets/ports/amsterdam.jpg',
       alt: 'Luchtfoto van de haven van Amsterdam',
-      credit: 'Wikimedia Commons',
-      sourceUrl:
-        'https://commons.wikimedia.org/wiki/File:Aerial_photograph_of_the_port_of_Amsterdam_in_2017_(3).jpg',
+      credit: 'Lokale asset',
+      sourceUrl: '/assets/ports/amsterdam.jpg',
     },
   },
   {
@@ -47,8 +45,8 @@ export const ports: Port[] = [
     image: {
       src: '/assets/ports/moerdijk.jpg',
       alt: 'Havenspoorlijn bij Moerdijk',
-      credit: 'Steven Lek / Wikimedia Commons',
-      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Havenspoorlijn_Moerdijk.jpg',
+      credit: 'Lokale asset',
+      sourceUrl: '/assets/ports/moerdijk.jpg',
     },
   },
   {
@@ -63,8 +61,8 @@ export const ports: Port[] = [
     image: {
       src: '/assets/ports/vlissingen-terneuzen.jpg',
       alt: 'Nieuwe Sluis bij Terneuzen',
-      credit: 'Krib / Wikimedia Commons',
-      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Nieuwe_Sluis_Terneuzen.jpg',
+      credit: 'Lokale asset',
+      sourceUrl: '/assets/ports/vlissingen-terneuzen.jpg',
     },
   },
   {
@@ -79,9 +77,8 @@ export const ports: Port[] = [
     image: {
       src: '/assets/ports/eemshaven.jpg',
       alt: 'Schip in Eemshaven',
-      credit: 'Wikimedia Commons',
-      sourceUrl:
-        'https://commons.wikimedia.org/wiki/File:Zuiderdiep_(IMO_9158070)_Eemshaven_2006.jpg',
+      credit: 'Lokale asset',
+      sourceUrl: '/assets/ports/eemshaven.jpg',
     },
   },
   {
@@ -96,9 +93,8 @@ export const ports: Port[] = [
     image: {
       src: '/assets/ports/nijmegen.jpg',
       alt: 'Spoorbrug gezien vanaf de haven van Nijmegen',
-      credit: 'Wikimedia Commons',
-      sourceUrl:
-        'https://commons.wikimedia.org/wiki/File:Railwaybridge,_view_from_Nijmegen_harbour,_Nijmegen,_The_Netherlands.jpg',
+      credit: 'Lokale asset',
+      sourceUrl: '/assets/ports/nijmegen.jpg',
     },
   },
   {
@@ -162,8 +158,8 @@ export const ports: Port[] = [
     image: {
       src: '/assets/ports/deventer-zutphen.jpg',
       alt: 'De IJssel bij Deventer',
-      credit: 'Ulamm / Wikimedia Commons',
-      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Deventer_IJssel.jpg',
+      credit: 'Lokale asset',
+      sourceUrl: '/assets/ports/deventer-zutphen.jpg',
     },
   },
   {
@@ -178,9 +174,8 @@ export const ports: Port[] = [
     image: {
       src: '/assets/ports/arnhem.jpg',
       alt: 'Rijnuiterwaarden met panorama van Arnhem',
-      credit: 'Wikimedia Commons',
-      sourceUrl:
-        'https://commons.wikimedia.org/wiki/File:Rhine_river_foreland_with_panorama_of_Arnhem_and_cows_-_panoramio.jpg',
+      credit: 'Lokale asset',
+      sourceUrl: '/assets/ports/arnhem.jpg',
     },
   },
   {
@@ -195,9 +190,8 @@ export const ports: Port[] = [
     image: {
       src: '/assets/ports/maastricht.jpg',
       alt: 'Maas bij Maastricht',
-      credit: 'Wikimedia Commons',
-      sourceUrl:
-        'https://commons.wikimedia.org/wiki/File:Maastricht,_Maas_%26_Stoa_-_panoramio_(cropped).jpg',
+      credit: 'Lokale asset',
+      sourceUrl: '/assets/ports/maastricht.jpg',
     },
   },
 ];

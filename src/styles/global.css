@@ -641,7 +641,7 @@ dd {
   position: relative;
   min-height: 100vh;
   overflow: hidden;
-  background: #d8e4df;
+  background: #051424;
 }
 
 .map-game-shell::before {
@@ -650,34 +650,167 @@ dd {
   z-index: 1;
   pointer-events: none;
   background:
-    linear-gradient(90deg, rgb(20 36 44 / 8%), transparent 26%),
-    linear-gradient(270deg, rgb(20 36 44 / 12%), transparent 34%);
+    linear-gradient(90deg, rgb(5 20 36 / 72%), transparent 38%),
+    linear-gradient(270deg, rgb(5 20 36 / 78%), transparent 34%),
+    linear-gradient(180deg, rgb(5 20 36 / 62%), transparent 26%);
   content: '';
+}
+
+.top-app-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 4;
+  display: flex;
+  min-height: 64px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 0 24px;
+  border-bottom: 1px solid rgb(255 255 255 / 10%);
+  background: rgb(5 20 36 / 88%);
+  color: #d4e4fa;
+  backdrop-filter: blur(18px);
+}
+
+.top-brand {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+}
+
+.top-brand strong {
+  color: #f2ca50;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.top-brand nav {
+  display: flex;
+  gap: 20px;
+}
+
+.top-brand nav span,
+.top-status span,
+.side-nav nav span {
+  color: #d0c5af;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.top-brand nav span[data-active='true'],
+.side-nav nav span[data-active='true'] {
+  color: #f2ca50;
+}
+
+.top-status {
+  display: flex;
+  gap: 10px;
+}
+
+.top-status span {
+  padding: 8px 10px;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 6px;
+  background: rgb(255 255 255 / 6%);
+  color: #d4e4fa;
+}
+
+.side-nav {
+  position: absolute;
+  top: 64px;
+  left: 0;
+  bottom: 0;
+  z-index: 3;
+  width: 248px;
+  padding: 22px 18px;
+  border-right: 1px solid rgb(255 255 255 / 8%);
+  background: rgb(1 15 31 / 88%);
+  color: #d4e4fa;
+  backdrop-filter: blur(18px);
+}
+
+.company-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgb(255 255 255 / 8%);
+}
+
+.company-mark {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid rgb(242 202 80 / 35%);
+  border-radius: 7px;
+  color: #f2ca50;
+  background: rgb(242 202 80 / 10%);
+  font-weight: 900;
+}
+
+.company-block strong,
+.company-block span {
+  display: block;
+}
+
+.company-block strong {
+  color: #f2ca50;
+  font-size: 0.86rem;
+  text-transform: uppercase;
+}
+
+.company-block span {
+  margin-top: 3px;
+  color: #d0c5af;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.side-nav nav {
+  display: grid;
+  gap: 4px;
+  padding-top: 22px;
+}
+
+.side-nav nav span {
+  padding: 12px 12px;
+  border-left: 3px solid transparent;
+}
+
+.side-nav nav span[data-active='true'] {
+  border-left-color: #f2ca50;
+  background: rgb(242 202 80 / 12%);
 }
 
 .game-hud {
   position: absolute;
-  z-index: 3;
+  z-index: 4;
   display: flex;
   gap: 10px;
   padding: 8px;
-  border: 1px solid rgb(255 255 255 / 72%);
+  border: 1px solid rgb(255 255 255 / 12%);
   border-radius: 10px;
-  background: var(--panel-glass);
+  background: linear-gradient(180deg, rgb(28 43 60 / 92%), rgb(5 20 36 / 92%));
+  color: #d4e4fa;
   box-shadow: var(--shadow);
   backdrop-filter: blur(14px);
 }
 
 .top-hud {
-  top: 18px;
-  left: 18px;
+  top: 88px;
+  left: 272px;
 }
 
 .game-hud div {
   min-width: 118px;
   padding: 10px 12px;
   border-radius: 6px;
-  background: #f7faf9;
+  background: rgb(255 255 255 / 6%);
 }
 
 .game-hud span,
@@ -698,26 +831,28 @@ dd {
 
 .fleet-panel {
   position: absolute;
-  top: 18px;
+  top: 88px;
   right: 18px;
   bottom: 18px;
-  z-index: 3;
+  z-index: 4;
   display: flex;
   width: min(410px, calc(100vw - 36px));
   flex-direction: column;
   gap: 14px;
   overflow: auto;
   padding: 18px;
-  border: 1px solid rgb(255 255 255 / 72%);
+  border: 1px solid rgb(255 255 255 / 12%);
   border-radius: 10px;
-  background: var(--panel-glass);
+  background: linear-gradient(180deg, rgb(28 43 60 / 94%), rgb(5 20 36 / 94%));
+  color: #d4e4fa;
   box-shadow: var(--shadow);
   backdrop-filter: blur(14px);
 }
 
 .panel-heading h1 {
   margin: 4px 0 0;
-  font-size: 1.8rem;
+  color: #f2ca50;
+  font-size: 1.6rem;
 }
 
 .fleet-list {
@@ -728,19 +863,19 @@ dd {
 .fleet-button {
   height: auto;
   min-height: 62px;
-  border-color: var(--line);
+  border-color: rgb(255 255 255 / 10%);
   border-radius: 7px;
-  color: var(--primary-strong);
-  background: #f7faf9;
+  color: #d4e4fa;
+  background: rgb(255 255 255 / 6%);
   text-align: left;
   box-shadow: none;
 }
 
 .fleet-button:hover,
 .fleet-button[data-selected='true'] {
-  border-color: var(--primary);
-  color: #ffffff;
-  background: var(--primary);
+  border-color: rgb(242 202 80 / 45%);
+  color: #f2ca50;
+  background: rgb(242 202 80 / 12%);
 }
 
 .action-panel,
@@ -748,9 +883,26 @@ dd {
   display: grid;
   gap: 10px;
   padding: 14px;
-  border: 1px solid var(--line);
+  border: 1px solid rgb(255 255 255 / 10%);
   border-radius: 8px;
-  background: #f7faf9;
+  background: rgb(255 255 255 / 6%);
+}
+
+.fleet-panel .status-panel {
+  border-color: rgb(255 255 255 / 10%);
+  background: rgb(255 255 255 / 6%);
+  color: #d4e4fa;
+}
+
+.fleet-panel dt,
+.fleet-panel .action-panel label {
+  color: #d0c5af;
+}
+
+.fleet-panel select {
+  border-color: rgb(255 255 255 / 12%);
+  color: #d4e4fa;
+  background: rgb(1 15 31 / 78%);
 }
 
 .action-panel label {
@@ -864,6 +1016,26 @@ dd {
   .map-game-shell {
     min-height: 120vh;
     overflow: auto;
+  }
+
+  .top-app-bar {
+    position: relative;
+    flex-wrap: wrap;
+    min-height: auto;
+    padding: 14px 16px;
+  }
+
+  .top-brand {
+    width: 100%;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .top-brand nav,
+  .top-status,
+  .side-nav {
+    display: none;
   }
 
   .port-map-fullscreen {
