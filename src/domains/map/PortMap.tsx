@@ -72,16 +72,20 @@ export function PortMap({
       return;
     }
 
-    markerRef.current?.remove();
+    if (!markerRef.current) {
+      const markerElement = document.createElement('div');
+      markerElement.className = 'ship-marker';
 
-    const markerElement = document.createElement('div');
-    markerElement.className = 'ship-marker';
+      markerRef.current = new maplibregl.Marker({ element: markerElement, anchor: 'center' }).addTo(
+        mapRef.current,
+      );
+    }
+
+    const markerElement = markerRef.current.getElement();
+    markerElement.dataset.vesselType = vessel.type;
     markerElement.setAttribute('aria-label', `${vessel.name} in ${port.name}`);
     markerElement.title = `${vessel.name} - ${port.name}`;
-
-    markerRef.current = new maplibregl.Marker({ element: markerElement, anchor: 'center' })
-      .setLngLat(activeCoordinate)
-      .addTo(mapRef.current);
+    markerRef.current.setLngLat(activeCoordinate);
 
     mapRef.current.flyTo({
       center: activeCoordinate,
@@ -89,7 +93,7 @@ export function PortMap({
       speed: 0.9,
       essential: true,
     });
-  }, [activeCoordinate, port.name, routeCoordinates?.length, vessel.name]);
+  }, [activeCoordinate, port.name, routeCoordinates?.length, vessel.name, vessel.type]);
 
   useEffect(() => {
     const map = mapRef.current;

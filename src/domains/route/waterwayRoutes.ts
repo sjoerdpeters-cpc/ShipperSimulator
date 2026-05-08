@@ -116,12 +116,18 @@ export function buildWaterwayRoute(origin: Port, destination: Port, speedKmh: nu
   const originLeg = waterwayAnchors[origin.id] ?? [origin.coordinates, networkHub];
   const destinationLeg = waterwayAnchors[destination.id] ?? [destination.coordinates, networkHub];
   const routeCoordinates = compactCoordinates([...originLeg, ...[...destinationLeg].reverse()]);
-  const distanceKm = routeCoordinates.reduce((total, coordinate, index) => {
+  const centerlineDistanceKm = routeCoordinates.reduce((total, coordinate, index) => {
     const next = routeCoordinates[index + 1];
     return next ? total + getDistanceKm(coordinate, next) : total;
   }, 0);
-  const sailingHoursPerDay = 10;
-  const durationDays = Math.max(1, Math.ceil(distanceKm / (speedKmh * sailingHoursPerDay)));
+  const distanceKm = centerlineDistanceKm * 1.18;
+  const effectiveSpeedKmh = Math.min(speedKmh, 12) * 0.72;
+  const sailingHoursPerDay = 9;
+  const portAndWaterwayDelayDays = 1;
+  const durationDays = Math.max(
+    2,
+    Math.ceil(distanceKm / (effectiveSpeedKmh * sailingHoursPerDay)) + portAndWaterwayDelayDays,
+  );
 
   return {
     routeCoordinates,

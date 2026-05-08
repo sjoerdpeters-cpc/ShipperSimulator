@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { ports } from '../data/ports';
 import { vessels } from '../data/vessels';
 import { PortMap } from '../domains/map/PortMap';
-import { getCoordinateAtProgress } from '../domains/route/waterwayRoutes';
+import { buildWaterwayRoute, getCoordinateAtProgress } from '../domains/route/waterwayRoutes';
 import type { FleetVesselStatus } from '../domains/vessel/types';
 import { useGameStore } from '../store/gameStore';
 
@@ -68,6 +68,10 @@ export function App() {
     : activePort.coordinates;
   const canStartSailing =
     activeFleetVessel?.status === 'route-planned' && activeFleetVessel.destinationPortId !== null;
+  const plannedRoute =
+    activeFleetVessel && destinationPort && !activeFleetVessel.voyage
+      ? buildWaterwayRoute(activePort, destinationPort, activeFleetVessel.vessel.maxSpeedKmh)
+      : null;
   const canBuy = balanceEuros >= selectedVessel.purchasePriceEuros && hasSelectedPort;
 
   useEffect(() => {
@@ -170,6 +174,18 @@ export function App() {
                 <dt>Bestemming</dt>
                 <dd>{destinationPort?.name ?? 'Geen'}</dd>
               </div>
+              {plannedRoute ? (
+                <>
+                  <div>
+                    <dt>Route</dt>
+                    <dd>{plannedRoute.distanceKm} km</dd>
+                  </div>
+                  <div>
+                    <dt>Vaartijd</dt>
+                    <dd>{plannedRoute.durationDays} dagen</dd>
+                  </div>
+                </>
+              ) : null}
             </dl>
           </section>
 
