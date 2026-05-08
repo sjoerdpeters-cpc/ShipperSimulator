@@ -41,6 +41,7 @@ export function App() {
   const simulation = useGameStore((state) => state.simulation);
   const timeScale = useGameStore((state) => state.timeScale);
   const setVessel = useGameStore((state) => state.setVessel);
+  const clearSelectedVessel = useGameStore((state) => state.clearSelectedVessel);
   const setPort = useGameStore((state) => state.setPort);
   const buySelectedVessel = useGameStore((state) => state.buySelectedVessel);
   const setActiveFleetVessel = useGameStore((state) => state.setActiveFleetVessel);
@@ -52,7 +53,6 @@ export function App() {
   const tick = useGameStore((state) => state.tick);
   const selectedVessel = vessel ?? vessels[0];
   const selectedPort = port ?? ports[0];
-  const hasSelectedPort = port !== null;
   const activeFleetVessel = fleet.find((fleetVessel) => fleetVessel.id === activeFleetVesselId) ?? fleet[0];
   const activePort =
     ports.find((candidate) => candidate.id === activeFleetVessel?.currentPortId) ?? selectedPort;
@@ -72,7 +72,7 @@ export function App() {
     activeFleetVessel && destinationPort && !activeFleetVessel.voyage
       ? buildWaterwayRoute(activePort, destinationPort, activeFleetVessel.vessel.maxSpeedKmh)
       : null;
-  const canBuy = balanceEuros >= selectedVessel.purchasePriceEuros && hasSelectedPort;
+  const canBuy = vessel !== null && port !== null && balanceEuros >= selectedVessel.purchasePriceEuros;
 
   useEffect(() => {
     if (timeScale === 0) {
@@ -85,6 +85,158 @@ export function App() {
 
     return () => window.clearInterval(timer);
   }, [tick, timeScale]);
+
+  if (!port) {
+    return (
+      <main className="onboarding-shell">
+        <section className="dialog-panel" aria-labelledby="home-port-title">
+          <div className="dialog-copy">
+            <span>Stap 1</span>
+            <h1 id="home-port-title">Kies je thuishaven</h1>
+            <p>
+              De thuishaven bepaalt waar je eerste schip ligt, welke dieselprijs geldt en
+              vanaf waar je straks routes plant.
+            </p>
+          </div>
+
+          <div className="port-grid dialog-grid">
+            {ports.map((candidate) => (
+              <article className="port-card" key={candidate.id}>
+                <img src={candidate.image.src} alt={candidate.image.alt} />
+                <div className="port-card-content">
+                  <div>
+                    <span>{candidate.region}</span>
+                    <h2>{candidate.name}</h2>
+                    <p>{candidate.description}</p>
+                  </div>
+                  <dl className="vessel-stats">
+                    <div>
+                      <dt>GPS</dt>
+                      <dd>
+                        {candidate.coordinates[1].toFixed(4)}, {candidate.coordinates[0].toFixed(4)}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Dieselprijs</dt>
+                      <dd>EUR {candidate.dieselPricePerLiterEuros.toFixed(2)}/l</dd>
+                    </div>
+                    <div>
+                      <dt>Ligkosten</dt>
+                      <dd>EUR {candidate.mooringCostPerDayEuros}/dag</dd>
+                    </div>
+                    <div>
+                      <dt>Aan/afmeerkosten</dt>
+                      <dd>EUR {candidate.dockingCostEuros}</dd>
+                    </div>
+                  </dl>
+                  <button type="button" onClick={() => setPort(candidate)}>
+                    Kies thuishaven
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  if (!vessel) {
+    return (
+      <main className="onboarding-shell">
+        <section className="dialog-panel" aria-labelledby="vessel-title">
+          <div className="dialog-copy">
+            <span>Stap 2</span>
+            <h1 id="vessel-title">Kies je eerste schip</h1>
+            <p>
+              Je startsaldo is {formatEuros(balanceEuros)}. Na je keuze kun je het schip
+              kopen en ga je naar het hoofdscherm.
+            </p>
+          </div>
+
+          <div className="vessel-grid dialog-grid">
+            {vessels.map((candidate) => (
+              <article className="vessel-card" key={candidate.id}>
+                <img src={candidate.image.src} alt={candidate.image.alt} />
+                <div className="vessel-card-content">
+                  <div>
+                    <span>{candidate.label}</span>
+                    <h2>{candidate.name}</h2>
+                    <p>{candidate.description}</p>
+                  </div>
+                  <dl className="vessel-stats">
+                    <div>
+                      <dt>Vaarsnelheid</dt>
+                      <dd>{candidate.maxSpeedKmh} km/u</dd>
+                    </div>
+                    <div>
+                      <dt>Inhoud</dt>
+                      <dd>{candidate.capacityLabel}</dd>
+                    </div>
+                    <div>
+                      <dt>Kosten per km</dt>
+                      <dd>EUR {candidate.costPerKmEuros}</dd>
+                    </div>
+                    <div>
+                      <dt>Aankoopprijs</dt>
+                      <dd>{formatEuros(candidate.purchasePriceEuros)}</dd>
+                    </div>
+                  </dl>
+                  <button
+                    disabled={balanceEuros < candidate.purchasePriceEuros}
+                    type="button"
+                    onClick={() => setVessel(candidate)}
+                  >
+                    Kies schip
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  if (!activeFleetVessel) {
+    return (
+      <main className="onboarding-shell">
+        <section className="purchase-dialog" aria-labelledby="purchase-title">
+          <img src={selectedVessel.image.src} alt={selectedVessel.image.alt} />
+          <div className="purchase-copy">
+            <span>Bevestigen</span>
+            <h1 id="purchase-title">Koop {selectedVessel.name}</h1>
+            <p>
+              Thuishaven: {selectedPort.name}. Na aankoop wordt dit schip toegevoegd aan
+              je vloot en opent het hoofdscherm.
+            </p>
+            <dl>
+              <div>
+                <dt>Startsaldo</dt>
+                <dd>{formatEuros(balanceEuros)}</dd>
+              </div>
+              <div>
+                <dt>Aankoopprijs</dt>
+                <dd>{formatEuros(selectedVessel.purchasePriceEuros)}</dd>
+              </div>
+              <div>
+                <dt>Na aankoop</dt>
+                <dd>{formatEuros(balanceEuros - selectedVessel.purchasePriceEuros)}</dd>
+              </div>
+            </dl>
+            <div className="purchase-actions">
+              <button type="button" onClick={clearSelectedVessel}>
+                Ander schip
+              </button>
+              <button className="buy-button" disabled={!canBuy} onClick={buySelectedVessel} type="button">
+                Koop schip
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+    );
+  }
 
   if (activeFleetVessel) {
     return (
@@ -243,194 +395,5 @@ export function App() {
     );
   }
 
-  return (
-    <main className="app-shell">
-      <aside className="sidebar" aria-label="Game status">
-        <p className="eyebrow">MVP 2</p>
-        <h1>Shipper Simulator</h1>
-        <p className="intro">
-          Kies je startschip en vertrekhaven. Daarna verschijnt je schip op de kaart op
-          de gekozen GPS-locatie.
-        </p>
-
-        <section className="status-panel" aria-labelledby="status-title">
-          <h2 id="status-title">Geselecteerd schip</h2>
-          <dl>
-            <div>
-              <dt>Type</dt>
-              <dd>{selectedVessel.label}</dd>
-            </div>
-            <div>
-              <dt>Snelheid</dt>
-              <dd>{selectedVessel.maxSpeedKmh} km/u</dd>
-            </div>
-            <div>
-              <dt>Inhoud</dt>
-              <dd>{selectedVessel.capacityLabel}</dd>
-            </div>
-            <div>
-              <dt>Kosten</dt>
-              <dd>EUR {selectedVessel.costPerKmEuros}/km</dd>
-            </div>
-            <div>
-              <dt>Aankoop</dt>
-              <dd>{formatEuros(selectedVessel.purchasePriceEuros)}</dd>
-            </div>
-          </dl>
-        </section>
-
-        <section className="status-panel" aria-labelledby="port-status-title">
-          <h2 id="port-status-title">Startpunt</h2>
-          <dl>
-            <div>
-              <dt>Haven</dt>
-              <dd>{selectedPort.name}</dd>
-            </div>
-            <div>
-              <dt>Diesel</dt>
-              <dd>EUR {selectedPort.dieselPricePerLiterEuros.toFixed(2)}/l</dd>
-            </div>
-            <div>
-              <dt>Liggeld</dt>
-              <dd>EUR {selectedPort.mooringCostPerDayEuros}/dag</dd>
-            </div>
-            <div>
-              <dt>Aan/afmeren</dt>
-              <dd>EUR {selectedPort.dockingCostEuros}</dd>
-            </div>
-          </dl>
-        </section>
-
-        <section className="status-panel" aria-labelledby="buy-status-title">
-          <h2 id="buy-status-title">Aankoop</h2>
-          <dl>
-            <div>
-              <dt>Startsaldo</dt>
-              <dd>{formatEuros(balanceEuros)}</dd>
-            </div>
-            <div>
-              <dt>Na aankoop</dt>
-              <dd>{formatEuros(balanceEuros - selectedVessel.purchasePriceEuros)}</dd>
-            </div>
-          </dl>
-          <button className="buy-button" disabled={!canBuy} onClick={buySelectedVessel} type="button">
-            Koop schip
-          </button>
-        </section>
-
-        <p className="selection-note">{selectedVessel.description}</p>
-      </aside>
-
-      <section className="workspace vessel-workspace" aria-label="Startschip en haven kiezen">
-        <div className="vessel-hero">
-          {hasSelectedPort ? (
-            <PortMap port={selectedPort} vessel={selectedVessel} />
-          ) : (
-            <img src={selectedVessel.image.src} alt={selectedVessel.image.alt} />
-          )}
-          <div className="hero-copy">
-            <span>{hasSelectedPort ? 'Gekozen startpunt' : selectedVessel.label}</span>
-            <h2>{hasSelectedPort ? selectedPort.name : selectedVessel.name}</h2>
-            <p>{hasSelectedPort ? selectedPort.description : selectedVessel.description}</p>
-          </div>
-        </div>
-
-        <div className="section-heading">
-          <div>
-            <span>Stap 1</span>
-            <h2>Kies een startschip</h2>
-          </div>
-        </div>
-
-        <div className="vessel-grid vessel-grid-compact">
-          {vessels.map((candidate) => {
-            const isSelected = candidate.id === selectedVessel.id;
-
-            return (
-              <article className="vessel-card" data-selected={isSelected} key={candidate.id}>
-                <img src={candidate.image.src} alt={candidate.image.alt} />
-                <div className="vessel-card-content">
-                  <div>
-                    <span>{candidate.label}</span>
-                    <h2>{candidate.name}</h2>
-                    <p>{candidate.description}</p>
-                  </div>
-                  <dl className="vessel-stats">
-                    <div>
-                      <dt>Vaarsnelheid</dt>
-                      <dd>{candidate.maxSpeedKmh} km/u</dd>
-                    </div>
-                    <div>
-                      <dt>Inhoud</dt>
-                      <dd>{candidate.capacityLabel}</dd>
-                    </div>
-                    <div>
-                      <dt>Kosten per km</dt>
-                      <dd>EUR {candidate.costPerKmEuros}</dd>
-                    </div>
-                    <div>
-                      <dt>Aankoopprijs</dt>
-                      <dd>{formatEuros(candidate.purchasePriceEuros)}</dd>
-                    </div>
-                  </dl>
-                  <button type="button" onClick={() => setVessel(candidate)}>
-                    {isSelected ? 'Gekozen' : 'Kies schip'}
-                  </button>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-
-        <div className="section-heading">
-          <div>
-            <span>Stap 2</span>
-            <h2>Kies een startpunt op de haven</h2>
-          </div>
-        </div>
-
-        <div className="port-grid">
-          {ports.map((candidate) => {
-            const isSelected = candidate.id === selectedPort.id;
-
-            return (
-              <article className="port-card" data-selected={isSelected} key={candidate.id}>
-                <img src={candidate.image.src} alt={candidate.image.alt} />
-                <div className="port-card-content">
-                  <div>
-                    <span>{candidate.region}</span>
-                    <h2>{candidate.name}</h2>
-                    <p>{candidate.description}</p>
-                  </div>
-                  <dl className="vessel-stats">
-                    <div>
-                      <dt>GPS</dt>
-                      <dd>
-                        {candidate.coordinates[1].toFixed(4)}, {candidate.coordinates[0].toFixed(4)}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>Dieselprijs</dt>
-                      <dd>EUR {candidate.dieselPricePerLiterEuros.toFixed(2)}/l</dd>
-                    </div>
-                    <div>
-                      <dt>Ligkosten</dt>
-                      <dd>EUR {candidate.mooringCostPerDayEuros}/dag</dd>
-                    </div>
-                    <div>
-                      <dt>Aan/afmeerkosten</dt>
-                      <dd>EUR {candidate.dockingCostEuros}</dd>
-                    </div>
-                  </dl>
-                  <button type="button" onClick={() => setPort(candidate)}>
-                    {isSelected && hasSelectedPort ? 'Op kaart' : 'Start hier'}
-                  </button>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      </section>
-    </main>
-  );
+  return null;
 }

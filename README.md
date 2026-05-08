@@ -50,6 +50,7 @@ De havendata staat configureerbaar in `src/data/ports.ts`. Lokale havenfoto's st
 MVP 3 voegt de eerste vloot- en tijdsimulatie toe:
 
 - Startsaldo: `EUR 250.000`
+- Onboarding is gesplitst: eerst thuishaven kiezen, daarna schip kiezen/aankopen
 - Schip kopen met aankoopprijs per scheepstype
 - Gekocht schip wordt toegevoegd aan de vloot
 - Gekozen haven wordt thuishaven

@@ -20,6 +20,7 @@ type GameStore = {
   route: RoutePlan | null;
   simulation: SimulationState;
   setVessel: (vessel: Vessel) => void;
+  clearSelectedVessel: () => void;
   setPort: (port: Port) => void;
   buySelectedVessel: () => boolean;
   setActiveFleetVessel: (fleetVesselId: string) => void;
@@ -42,6 +43,7 @@ export const useGameStore = create<GameStore>((set) => ({
   route: null,
   simulation: createInitialSimulationState(),
   setVessel: (vessel) => set({ vessel }),
+  clearSelectedVessel: () => set({ vessel: null }),
   setPort: (port) => set({ port }),
   buySelectedVessel: () => {
     let didBuy = false;
