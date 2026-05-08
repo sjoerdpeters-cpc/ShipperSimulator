@@ -109,8 +109,8 @@ export const ports: Port[] = [
     image: {
       src: '/assets/ports/tiel.jpg',
       alt: 'Rivier de Waal bij Tiel',
-      credit: 'Jan dijkstra / Wikimedia Commons',
-      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Rivier_de_Waal_bij_Tiel.jpg',
+      credit: 'Lokale asset',
+      sourceUrl: '/assets/ports/tiel.jpg',
     },
   },
   {
@@ -125,9 +125,8 @@ export const ports: Port[] = [
     image: {
       src: '/assets/ports/venlo.jpg',
       alt: 'Binnenvaartschip op de Maas bij Venlo',
-      credit: 'Wikimedia Commons',
-      sourceUrl:
-        'https://commons.wikimedia.org/wiki/File:Venlo,_binnenvaartsschip_in_de_Maas_vanaf_de_spoorbrug_IMG_7148_2023-07-10_17.59.jpg',
+      credit: 'Lokale asset',
+      sourceUrl: '/assets/ports/venlo.jpg',
     },
   },
   {
@@ -142,8 +141,8 @@ export const ports: Port[] = [
     image: {
       src: '/assets/ports/utrecht.jpg',
       alt: 'Parkhaven aan het Merwedekanaal in Utrecht',
-      credit: 'Joostik / Wikimedia Commons',
-      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Parkhaven_Utrecht.JPG',
+      credit: 'Lokale asset',
+      sourceUrl: '/assets/ports/utrecht.jpg',
     },
   },
   {
