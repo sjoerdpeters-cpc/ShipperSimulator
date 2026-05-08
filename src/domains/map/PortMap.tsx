@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import type { Port } from '../port/types';
 import type { Vessel } from '../vessel/types';
@@ -46,6 +46,22 @@ export function PortMap({
   const reportMapError = () => {
     window.setTimeout(() => setMapError(true), 0);
   };
+  const runWhenMapLoaded = useCallback((callback: (map: maplibregl.Map) => void) => {
+    const map = mapRef.current;
+
+    if (!map || mapError) {
+      return;
+    }
+
+    const run = () => callback(map);
+
+    if (map.loaded()) {
+      run();
+      return;
+    }
+
+    map.once('load', run);
+  }, [mapError]);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) {
@@ -79,18 +95,12 @@ export function PortMap({
   }, [port.coordinates]);
 
   useEffect(() => {
-    if (!mapRef.current || mapError) {
-      return;
-    }
-
-    try {
+    runWhenMapLoaded((map) => {
       if (!markerRef.current) {
         const markerElement = document.createElement('div');
         markerElement.className = 'ship-marker';
 
-        markerRef.current = new maplibregl.Marker({ element: markerElement, anchor: 'center' }).addTo(
-          mapRef.current,
-        );
+        markerRef.current = new maplibregl.Marker({ element: markerElement, anchor: 'center' }).addTo(map);
       }
 
       const markerElement = markerRef.current.getElement();
@@ -99,91 +109,80 @@ export function PortMap({
       markerElement.title = `${vessel.name} - ${port.name}`;
       markerRef.current.setLngLat(activeCoordinate);
 
-      mapRef.current.flyTo({
+      map.flyTo({
         center: activeCoordinate,
         zoom: routeCoordinates?.length ? 8 : 11,
         speed: 0.9,
         essential: true,
       });
-    } catch {
-      reportMapError();
-    }
-  }, [activeCoordinate, mapError, port.name, routeCoordinates?.length, vessel.name, vessel.type]);
+    });
+  }, [
+    activeCoordinate,
+    mapError,
+    port.name,
+    routeCoordinates?.length,
+    runWhenMapLoaded,
+    vessel.name,
+    vessel.type,
+  ]);
 
   useEffect(() => {
-    const map = mapRef.current;
-
-    if (!map || mapError) {
-      return;
-    }
-
-    const syncRoute = () => {
-      try {
-        if (map.getLayer('active-voyage-route')) {
-          map.removeLayer('active-voyage-route');
-        }
-
-        if (map.getSource('active-voyage-route')) {
-          map.removeSource('active-voyage-route');
-        }
-
-        destinationMarkerRef.current?.remove();
-        destinationMarkerRef.current = null;
-
-        if (!routeCoordinates || routeCoordinates.length < 2) {
-          return;
-        }
-
-        map.addSource('active-voyage-route', {
-          type: 'geojson',
-          data: {
-            type: 'Feature',
-            properties: {},
-            geometry: {
-              type: 'LineString',
-              coordinates: routeCoordinates,
-            },
-          },
-        });
-
-        map.addLayer({
-          id: 'active-voyage-route',
-          type: 'line',
-          source: 'active-voyage-route',
-          paint: {
-            'line-color': '#176b78',
-            'line-width': 5,
-            'line-opacity': 0.78,
-          },
-        });
-
-        const destinationElement = document.createElement('div');
-        destinationElement.className = 'destination-marker';
-        destinationElement.title = 'Bestemming';
-        destinationMarkerRef.current = new maplibregl.Marker({
-          element: destinationElement,
-          anchor: 'center',
-        })
-          .setLngLat(routeCoordinates[routeCoordinates.length - 1])
-          .addTo(map);
-
-        const bounds = routeCoordinates.reduce(
-          (currentBounds, coordinate) => currentBounds.extend(coordinate),
-          new maplibregl.LngLatBounds(routeCoordinates[0], routeCoordinates[0]),
-        );
-        map.fitBounds(bounds, { padding: 90, maxZoom: 9, duration: 700 });
-      } catch {
-        reportMapError();
+    runWhenMapLoaded((map) => {
+      if (map.getLayer('active-voyage-route')) {
+        map.removeLayer('active-voyage-route');
       }
-    };
 
-    if (map.isStyleLoaded()) {
-      syncRoute();
-      return;
-    }
+      if (map.getSource('active-voyage-route')) {
+        map.removeSource('active-voyage-route');
+      }
 
-    map.once('load', syncRoute);
-  }, [mapError, routeCoordinates]);
+      destinationMarkerRef.current?.remove();
+      destinationMarkerRef.current = null;
+
+      if (!routeCoordinates || routeCoordinates.length < 2) {
+        return;
+      }
+
+      map.addSource('active-voyage-route', {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'LineString',
+            coordinates: routeCoordinates,
+          },
+        },
+      });
+
+      map.addLayer({
+        id: 'active-voyage-route',
+        type: 'line',
+        source: 'active-voyage-route',
+        paint: {
+          'line-color': '#176b78',
+          'line-width': 5,
+          'line-opacity': 0.78,
+        },
+      });
+
+      const destinationElement = document.createElement('div');
+      destinationElement.className = 'destination-marker';
+      destinationElement.title = 'Bestemming';
+      destinationMarkerRef.current = new maplibregl.Marker({
+        element: destinationElement,
+        anchor: 'center',
+      })
+        .setLngLat(routeCoordinates[routeCoordinates.length - 1])
+        .addTo(map);
+
+      const bounds = routeCoordinates.reduce(
+        (currentBounds, coordinate) => currentBounds.extend(coordinate),
+        new maplibregl.LngLatBounds(routeCoordinates[0], routeCoordinates[0]),
+      );
+      map.fitBounds(bounds, { padding: 90, maxZoom: 9, duration: 700 });
+    });
+  }, [mapError, routeCoordinates, runWhenMapLoaded]);
 
   if (mapError) {
     return (
