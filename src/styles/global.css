@@ -40,8 +40,24 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 button:hover {
   background: var(--primary-strong);
+}
+
+select {
+  min-height: 42px;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0 12px;
+  color: #17212b;
+  background: var(--surface);
+  font: inherit;
 }
 
 .app-shell {
@@ -164,6 +180,12 @@ dd {
 .port-map {
   width: 100%;
   min-height: 320px;
+}
+
+.port-map-fullscreen {
+  position: absolute;
+  inset: 0;
+  min-height: 100vh;
 }
 
 .vessel-hero .hero-copy {
@@ -318,6 +340,141 @@ dd {
   content: '';
 }
 
+.map-game-shell {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #d8e4df;
+}
+
+.game-hud {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid rgb(255 255 255 / 72%);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 92%);
+  box-shadow: var(--shadow);
+}
+
+.top-hud {
+  top: 18px;
+  left: 18px;
+}
+
+.game-hud div {
+  min-width: 112px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #f8fbfb;
+}
+
+.game-hud span,
+.panel-heading span,
+.fleet-button span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.game-hud strong,
+.fleet-button strong {
+  display: block;
+  margin-top: 4px;
+}
+
+.fleet-panel {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  bottom: 18px;
+  z-index: 2;
+  display: flex;
+  width: min(390px, calc(100vw - 36px));
+  flex-direction: column;
+  gap: 14px;
+  overflow: auto;
+  padding: 18px;
+  border: 1px solid rgb(255 255 255 / 72%);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 94%);
+  box-shadow: var(--shadow);
+}
+
+.panel-heading h1 {
+  margin: 4px 0 0;
+  font-size: 1.8rem;
+}
+
+.fleet-list {
+  display: grid;
+  gap: 8px;
+}
+
+.fleet-button {
+  height: auto;
+  min-height: 62px;
+  border-color: var(--line);
+  color: var(--primary-strong);
+  background: #f8fbfb;
+  text-align: left;
+}
+
+.fleet-button:hover,
+.fleet-button[data-selected='true'] {
+  border-color: var(--primary);
+  color: #ffffff;
+  background: var(--primary);
+}
+
+.action-panel,
+.time-panel {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f8fbfb;
+}
+
+.action-panel label {
+  display: grid;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.segmented-controls {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.segmented-controls button {
+  min-height: 38px;
+  padding: 0 8px;
+  border-color: var(--line);
+  color: var(--primary-strong);
+  background: var(--surface);
+  font-size: 0.84rem;
+}
+
+.segmented-controls button[data-selected='true'] {
+  border-color: var(--primary);
+  color: #ffffff;
+  background: var(--primary);
+}
+
+.buy-button {
+  width: 100%;
+  margin-top: 16px;
+}
+
 .map-placeholder {
   display: grid;
   place-items: center;
@@ -390,6 +547,30 @@ dd {
 
   .port-grid {
     grid-template-columns: 1fr;
+  }
+
+  .map-game-shell {
+    min-height: 120vh;
+    overflow: auto;
+  }
+
+  .port-map-fullscreen {
+    position: fixed;
+    min-height: 100vh;
+  }
+
+  .top-hud,
+  .fleet-panel {
+    position: relative;
+    top: auto;
+    right: auto;
+    left: auto;
+    bottom: auto;
+    margin: 12px;
+  }
+
+  .game-hud {
+    flex-wrap: wrap;
   }
 }
 

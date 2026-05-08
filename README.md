@@ -45,6 +45,18 @@ MVP 2 voegt de keuze voor een starthaven toe:
 
 De havendata staat configureerbaar in `src/data/ports.ts`. Lokale havenfoto's staan in `public/assets/ports/`. Na het kiezen van een haven toont de MapLibre-kaart het gekozen schipicoon op de GPS-locatie van die haven.
 
+## MVP 3
+
+MVP 3 voegt de eerste vloot- en tijdsimulatie toe:
+
+- Startsaldo: `EUR 250.000`
+- Schip kopen met aankoopprijs per scheepstype
+- Gekocht schip wordt toegevoegd aan de vloot
+- Gekozen haven wordt thuishaven
+- Na aankoop wordt de kaart beeldvullend
+- Vlootacties: bunkeren, route kiezen en laten liggen
+- Tijdcontrols: pauze, 1 dag/sec en 2 dagen/sec
+
 ## Lokale ontwikkeling
 
 ```bash

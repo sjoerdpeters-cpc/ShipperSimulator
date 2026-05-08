@@ -6,6 +6,7 @@ import type { Vessel } from '../vessel/types';
 type PortMapProps = {
   port: Port;
   vessel: Vessel;
+  fullscreen?: boolean;
 };
 
 const osmRasterStyle: maplibregl.StyleSpecification = {
@@ -27,7 +28,7 @@ const osmRasterStyle: maplibregl.StyleSpecification = {
   ],
 };
 
-export function PortMap({ port, vessel }: PortMapProps) {
+export function PortMap({ port, vessel, fullscreen = false }: PortMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const markerRef = useRef<maplibregl.Marker | null>(null);
@@ -78,5 +79,5 @@ export function PortMap({ port, vessel }: PortMapProps) {
     });
   }, [port, vessel.name]);
 
-  return <div className="port-map" ref={containerRef} />;
+  return <div className={fullscreen ? 'port-map port-map-fullscreen' : 'port-map'} ref={containerRef} />;
 }

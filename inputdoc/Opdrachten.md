@@ -16,13 +16,31 @@ Voeg een foto toe en zorg dat deze allemaal andere eigenschappen hebben: vaarsne
 
 
 
-MVP 1: Kies een startpunt op de haven:
+MVP 2: Kies een startpunt op de haven:
 
 Rotterdam, Amsterdam, Moerdijk, Vlissingen/Terneuzen, Eemshaven, Nijmegen, Tiel, Venlo, Utrecht, Deventer/Zutphen, Arnhem en Maastricht.
 
 Voeg een foto toe van de haven en zorg dat deze allemaal andere eigenschappen hebben: locatie (GPS) - dieselprijs - ligkosten per dag - aan en af meerkosten en stop deze in een configureerbaar los databestand
 
 Ga daarna naar de MAP en toon een schip icoon op deze plek
+
+
+
+MVP 3: Na keuze (kopen van) schip, zorg dat dit schip in de vloot van de speler opgenomen wordt; Vanaf dat moment wordt de kaart beeldvullend. 
+
+
+
+De gekozen haven is de 'thuishaven'- De speler kan nu vanuit de vloot kiezen wat hij met de boot wil:
+
+a. om het schip te tanken (bunkeren) - de kost geld
+
+b. een route te kiezen - naar de andere haven.s
+
+c. het schip te laten liggen;
+
+
+
+Door knoppen in het scherm kan de speler de tijd simuleren - zoals bij de meeste simulatiegames; elke dag is 1 sec (later anders in te stellen); daarnaast kan de speler versnellen (2 dagen in 1 sec) en pauzeren.
 
 
 

@@ -17,6 +17,8 @@ export const vessels: Vessel[] = [
     capacityLabel: '208 TEU',
     capacityTonnes: 3200,
     costPerKmEuros: 42,
+    purchasePriceEuros: 228000,
+    fuelCapacityLiters: 14500,
   },
   {
     id: 'tanker-ship',
@@ -34,6 +36,8 @@ export const vessels: Vessel[] = [
     capacityLabel: '2.450 m3',
     capacityTonnes: 2100,
     costPerKmEuros: 55,
+    purchasePriceEuros: 238000,
+    fuelCapacityLiters: 16500,
   },
   {
     id: 'dry-cargo-ship',
@@ -51,6 +55,8 @@ export const vessels: Vessel[] = [
     capacityLabel: '1.850 ton',
     capacityTonnes: 1850,
     costPerKmEuros: 31,
+    purchasePriceEuros: 176000,
+    fuelCapacityLiters: 11200,
   },
   {
     id: 'push-boat',
@@ -68,5 +74,7 @@ export const vessels: Vessel[] = [
     capacityLabel: '4.800 ton',
     capacityTonnes: 4800,
     costPerKmEuros: 68,
+    purchasePriceEuros: 246000,
+    fuelCapacityLiters: 21000,
   },
 ];

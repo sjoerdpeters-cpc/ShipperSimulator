@@ -14,4 +14,18 @@ export type Vessel = {
   capacityLabel: string;
   capacityTonnes: number;
   costPerKmEuros: number;
+  purchasePriceEuros: number;
+  fuelCapacityLiters: number;
+};
+
+export type FleetVesselStatus = 'idle' | 'bunkering' | 'route-planned';
+
+export type FleetVessel = {
+  id: string;
+  vessel: Vessel;
+  homePortId: string;
+  currentPortId: string;
+  destinationPortId: string | null;
+  fuelLiters: number;
+  status: FleetVesselStatus;
 };

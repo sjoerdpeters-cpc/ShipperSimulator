@@ -48,7 +48,7 @@ UI-componenten lezen state uit Zustand en roepen domeinacties aan. Domeinmodules
 
 ## 6. Game State
 
-De centrale store bevat alleen gedeelde game state: actieve MVP-status, geselecteerd schip, route, simulatietijd, geld, opdrachten en events. Tijdelijke UI-state blijft lokaal in componenten.
+De centrale store bevat alleen gedeelde game state: actieve MVP-status, spelerbalans, geselecteerd schip, gekozen haven, vloot, route, simulatietijd, opdrachten en events. Tijdelijke UI-state blijft lokaal in componenten.
 
 ## 7. Simulatietijd
 
@@ -71,9 +71,10 @@ De webapp is desktop-first, maar houdt rekening met latere PWA/mobile uitbreidin
 - MVP 0: technische basis, deployment, architectuur en kwaliteitschecks.
 - MVP 1: startschip kiezen met configureerbare scheepsdata en lokale foto's.
 - MVP 2: startpunt op haven kiezen en schipicoon tonen op MapLibre-kaart.
+- MVP 3: schip kopen, vloot beheren, thuishaven gebruiken en tijd simuleren.
 - MVP x: Nederlandse waterkaart.
 - MVP x: schip en route kiezen met simulatie in realistisch aantal dagen.
-- MVP 3: havens en vrachtopdrachten.
+- MVP x: havens en vrachtopdrachten.
 - MVP 4: bruggen, sluizen en wachttijden.
 - MVP 5: geld, brandstof, onderhoud en planning.
 - MVP 6: realistische binnenvaart-economie.

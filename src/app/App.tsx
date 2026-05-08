@@ -1,16 +1,191 @@
+import { useEffect } from 'react';
 import { ports } from '../data/ports';
 import { vessels } from '../data/vessels';
 import { PortMap } from '../domains/map/PortMap';
+import type { FleetVesselStatus } from '../domains/vessel/types';
 import { useGameStore } from '../store/gameStore';
+
+const euroFormatter = new Intl.NumberFormat('nl-NL', {
+  style: 'currency',
+  currency: 'EUR',
+  maximumFractionDigits: 0,
+});
+
+function formatEuros(value: number) {
+  return euroFormatter.format(value);
+}
+
+function getStatusLabel(status: FleetVesselStatus) {
+  if (status === 'bunkering') {
+    return 'Bunkeren';
+  }
+
+  if (status === 'route-planned') {
+    return 'Route gepland';
+  }
+
+  return 'Ligt stil';
+}
 
 export function App() {
   const vessel = useGameStore((state) => state.vessel);
   const port = useGameStore((state) => state.port);
+  const balanceEuros = useGameStore((state) => state.balanceEuros);
+  const fleet = useGameStore((state) => state.fleet);
+  const activeFleetVesselId = useGameStore((state) => state.activeFleetVesselId);
+  const simulation = useGameStore((state) => state.simulation);
+  const timeScale = useGameStore((state) => state.timeScale);
   const setVessel = useGameStore((state) => state.setVessel);
   const setPort = useGameStore((state) => state.setPort);
+  const buySelectedVessel = useGameStore((state) => state.buySelectedVessel);
+  const setActiveFleetVessel = useGameStore((state) => state.setActiveFleetVessel);
+  const bunkerActiveVessel = useGameStore((state) => state.bunkerActiveVessel);
+  const planRouteForActiveVessel = useGameStore((state) => state.planRouteForActiveVessel);
+  const idleActiveVessel = useGameStore((state) => state.idleActiveVessel);
+  const setTimeScale = useGameStore((state) => state.setTimeScale);
+  const tick = useGameStore((state) => state.tick);
   const selectedVessel = vessel ?? vessels[0];
   const selectedPort = port ?? ports[0];
   const hasSelectedPort = port !== null;
+  const activeFleetVessel = fleet.find((fleetVessel) => fleetVessel.id === activeFleetVesselId) ?? fleet[0];
+  const activePort =
+    ports.find((candidate) => candidate.id === activeFleetVessel?.currentPortId) ?? selectedPort;
+  const destinationPort = ports.find(
+    (candidate) => candidate.id === activeFleetVessel?.destinationPortId,
+  );
+  const canBuy = balanceEuros >= selectedVessel.purchasePriceEuros && hasSelectedPort;
+
+  useEffect(() => {
+    if (timeScale === 0) {
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      tick(timeScale);
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [tick, timeScale]);
+
+  if (activeFleetVessel) {
+    return (
+      <main className="map-game-shell">
+        <PortMap fullscreen port={activePort} vessel={activeFleetVessel.vessel} />
+
+        <section className="game-hud top-hud" aria-label="Spelstatus">
+          <div>
+            <span>Saldo</span>
+            <strong>{formatEuros(balanceEuros)}</strong>
+          </div>
+          <div>
+            <span>Dag</span>
+            <strong>{simulation.day}</strong>
+          </div>
+          <div>
+            <span>Tijd</span>
+            <strong>{timeScale === 0 ? 'Pauze' : `${timeScale}x`}</strong>
+          </div>
+        </section>
+
+        <aside className="fleet-panel" aria-label="Vlootbeheer">
+          <div className="panel-heading">
+            <span>MVP 3</span>
+            <h1>Vloot</h1>
+          </div>
+
+          <div className="fleet-list">
+            {fleet.map((fleetVessel) => (
+              <button
+                className="fleet-button"
+                data-selected={fleetVessel.id === activeFleetVessel.id}
+                key={fleetVessel.id}
+                onClick={() => setActiveFleetVessel(fleetVessel.id)}
+                type="button"
+              >
+                <span>{fleetVessel.vessel.label}</span>
+                <strong>{fleetVessel.vessel.name}</strong>
+              </button>
+            ))}
+          </div>
+
+          <section className="status-panel">
+            <h2>{activeFleetVessel.vessel.name}</h2>
+            <dl>
+              <div>
+                <dt>Thuishaven</dt>
+                <dd>{ports.find((candidate) => candidate.id === activeFleetVessel.homePortId)?.name}</dd>
+              </div>
+              <div>
+                <dt>Ligplaats</dt>
+                <dd>{activePort.name}</dd>
+              </div>
+              <div>
+                <dt>Status</dt>
+                <dd>{getStatusLabel(activeFleetVessel.status)}</dd>
+              </div>
+              <div>
+                <dt>Brandstof</dt>
+                <dd>
+                  {Math.round(activeFleetVessel.fuelLiters)} /{' '}
+                  {activeFleetVessel.vessel.fuelCapacityLiters} l
+                </dd>
+              </div>
+              <div>
+                <dt>Bestemming</dt>
+                <dd>{destinationPort?.name ?? 'Geen'}</dd>
+              </div>
+            </dl>
+          </section>
+
+          <section className="action-panel" aria-label="Scheepsacties">
+            <h2>Acties</h2>
+            <button type="button" onClick={() => bunkerActiveVessel(activePort)}>
+              Bunkeren
+            </button>
+            <label>
+              Route kiezen
+              <select
+                onChange={(event) => planRouteForActiveVessel(event.target.value)}
+                value={activeFleetVessel.destinationPortId ?? ''}
+              >
+                <option value="" disabled>
+                  Kies bestemming
+                </option>
+                {ports
+                  .filter((candidate) => candidate.id !== activePort.id)
+                  .map((candidate) => (
+                    <option key={candidate.id} value={candidate.id}>
+                      {candidate.name}
+                    </option>
+                  ))}
+              </select>
+            </label>
+            <button type="button" onClick={idleActiveVessel}>
+              Laat liggen
+            </button>
+          </section>
+
+          <section className="time-panel" aria-label="Tijdsimulatie">
+            <h2>Tijd</h2>
+            <div className="segmented-controls">
+              <button data-selected={timeScale === 0} onClick={() => setTimeScale(0)} type="button">
+                Pauze
+              </button>
+              <button data-selected={timeScale === 1} onClick={() => setTimeScale(1)} type="button">
+                1 dag/sec
+              </button>
+              <button data-selected={timeScale === 2} onClick={() => setTimeScale(2)} type="button">
+                2 dagen/sec
+              </button>
+            </div>
+            <button type="button" onClick={() => tick(1)}>
+              Simuleer 1 dag
+            </button>
+          </section>
+        </aside>
+      </main>
+    );
+  }
 
   return (
     <main className="app-shell">
@@ -41,6 +216,10 @@ export function App() {
               <dt>Kosten</dt>
               <dd>EUR {selectedVessel.costPerKmEuros}/km</dd>
             </div>
+            <div>
+              <dt>Aankoop</dt>
+              <dd>{formatEuros(selectedVessel.purchasePriceEuros)}</dd>
+            </div>
           </dl>
         </section>
 
@@ -64,6 +243,23 @@ export function App() {
               <dd>EUR {selectedPort.dockingCostEuros}</dd>
             </div>
           </dl>
+        </section>
+
+        <section className="status-panel" aria-labelledby="buy-status-title">
+          <h2 id="buy-status-title">Aankoop</h2>
+          <dl>
+            <div>
+              <dt>Startsaldo</dt>
+              <dd>{formatEuros(balanceEuros)}</dd>
+            </div>
+            <div>
+              <dt>Na aankoop</dt>
+              <dd>{formatEuros(balanceEuros - selectedVessel.purchasePriceEuros)}</dd>
+            </div>
+          </dl>
+          <button className="buy-button" disabled={!canBuy} onClick={buySelectedVessel} type="button">
+            Koop schip
+          </button>
         </section>
 
         <p className="selection-note">{selectedVessel.description}</p>
@@ -115,6 +311,10 @@ export function App() {
                     <div>
                       <dt>Kosten per km</dt>
                       <dd>EUR {candidate.costPerKmEuros}</dd>
+                    </div>
+                    <div>
+                      <dt>Aankoopprijs</dt>
+                      <dd>{formatEuros(candidate.purchasePriceEuros)}</dd>
                     </div>
                   </dl>
                   <button type="button" onClick={() => setVessel(candidate)}>
