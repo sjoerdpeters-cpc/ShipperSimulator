@@ -38,11 +38,23 @@ git remote add origin https://github.com/sjoerdpeters-cpc/ShipperSimulator.git
 git push -u origin main
 ```
 
-Vercel:
+Vercel production:
+
+- Live URL: https://shipper-simulator.vercel.app
+- Project: `shipper-simulator`
+- GitHub repository: https://github.com/sjoerdpeters-cpc/ShipperSimulator
+
+Vercel settings:
 
 - Framework preset: Vite
 - Build command: `npm run build`
 - Output directory: `dist`
 - Install command: `npm install`
 
-De Vercel-config staat in `vercel.json`. Een live deploy vereist een ingelogde Vercel CLI of gekoppelde GitHub/Vercel projectconfiguratie.
+De Vercel-config staat in `vercel.json`. Het project is gekoppeld aan GitHub; pushes naar `main` horen automatisch een production deploy naar Vercel te starten.
+
+Handmatige productie-deploy indien nodig:
+
+```bash
+vercel deploy --prod --yes
+```
