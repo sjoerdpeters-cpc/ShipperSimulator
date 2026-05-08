@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import type { Port } from '../port/types';
 import type { Vessel } from '../vessel/types';
@@ -16,7 +16,12 @@ const osmRasterStyle: maplibregl.StyleSpecification = {
   sources: {
     osm: {
       type: 'raster',
-      tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+      tiles: [
+        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+        'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      ],
       tileSize: 256,
       attribution: 'OpenStreetMap contributors',
     },
@@ -41,27 +46,12 @@ export function PortMap({
   const mapRef = useRef<maplibregl.Map | null>(null);
   const markerRef = useRef<maplibregl.Marker | null>(null);
   const destinationMarkerRef = useRef<maplibregl.Marker | null>(null);
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const [mapError, setMapError] = useState(false);
   const activeCoordinate = shipCoordinate ?? port.coordinates;
   const reportMapError = () => {
     window.setTimeout(() => setMapError(true), 0);
   };
-  const runWhenMapLoaded = useCallback((callback: (map: maplibregl.Map) => void) => {
-    const map = mapRef.current;
-
-    if (!map || mapError) {
-      return;
-    }
-
-    const run = () => callback(map);
-
-    if (map.loaded()) {
-      run();
-      return;
-    }
-
-    map.once('load', run);
-  }, [mapError]);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) {
@@ -80,6 +70,13 @@ export function PortMap({
         new maplibregl.NavigationControl({ showCompass: false }),
         'top-right',
       );
+      mapRef.current.on('error', reportMapError);
+      mapRef.current.once('load', () => {
+        mapRef.current?.resize();
+      });
+      window.requestAnimationFrame(() => {
+        mapRef.current?.resize();
+      });
     } catch {
       reportMapError();
     }
@@ -91,11 +88,23 @@ export function PortMap({
       mapRef.current = null;
       markerRef.current = null;
       destinationMarkerRef.current = null;
+      resizeObserverRef.current?.disconnect();
+      resizeObserverRef.current = null;
     };
   }, [port.coordinates]);
 
   useEffect(() => {
-    runWhenMapLoaded((map) => {
+    const map = mapRef.current;
+
+    if (!map || mapError) {
+      return;
+    }
+
+    const syncMarker = () => {
+      if (mapError) {
+        return;
+      }
+
       if (!markerRef.current) {
         const markerElement = document.createElement('div');
         markerElement.className = 'ship-marker';
@@ -115,19 +124,28 @@ export function PortMap({
         speed: 0.9,
         essential: true,
       });
-    });
-  }, [
-    activeCoordinate,
-    mapError,
-    port.name,
-    routeCoordinates?.length,
-    runWhenMapLoaded,
-    vessel.name,
-    vessel.type,
-  ]);
+    };
+
+    if (map.isStyleLoaded()) {
+      syncMarker();
+      return;
+    }
+
+    map.once('load', syncMarker);
+  }, [activeCoordinate, mapError, port.name, routeCoordinates?.length, vessel.name, vessel.type]);
 
   useEffect(() => {
-    runWhenMapLoaded((map) => {
+    const map = mapRef.current;
+
+    if (!map || mapError) {
+      return;
+    }
+
+    const syncRoute = () => {
+      if (mapError) {
+        return;
+      }
+
       if (map.getLayer('active-voyage-route')) {
         map.removeLayer('active-voyage-route');
       }
@@ -181,8 +199,44 @@ export function PortMap({
         new maplibregl.LngLatBounds(routeCoordinates[0], routeCoordinates[0]),
       );
       map.fitBounds(bounds, { padding: 90, maxZoom: 9, duration: 700 });
-    });
-  }, [mapError, routeCoordinates, runWhenMapLoaded]);
+    };
+
+    if (map.isStyleLoaded()) {
+      syncRoute();
+      return;
+    }
+
+    map.once('load', syncRoute);
+  }, [mapError, routeCoordinates]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+
+    if (!map || !containerRef.current || mapError) {
+      return;
+    }
+
+    const supportsResizeObserver = typeof ResizeObserver !== 'undefined';
+
+    if (supportsResizeObserver) {
+      resizeObserverRef.current?.disconnect();
+      resizeObserverRef.current = new ResizeObserver(() => {
+        map.resize();
+      });
+      resizeObserverRef.current.observe(containerRef.current);
+      return () => {
+        resizeObserverRef.current?.disconnect();
+        resizeObserverRef.current = null;
+      };
+    }
+
+    const handleResize = () => map.resize();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [mapError]);
 
   if (mapError) {
     return (
