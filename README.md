@@ -26,6 +26,25 @@ MVP 1 voegt de keuze voor een startschip toe:
 
 De scheepsdata staat configureerbaar in `src/data/vessels.ts`. Lokale foto's staan in `public/assets/vessels/`.
 
+## MVP 2
+
+MVP 2 voegt de keuze voor een starthaven toe:
+
+- Rotterdam
+- Amsterdam
+- Moerdijk
+- Vlissingen/Terneuzen
+- Eemshaven
+- Nijmegen
+- Tiel
+- Venlo
+- Utrecht
+- Deventer/Zutphen
+- Arnhem
+- Maastricht
+
+De havendata staat configureerbaar in `src/data/ports.ts`. Lokale havenfoto's staan in `public/assets/ports/`. Na het kiezen van een haven toont de MapLibre-kaart het gekozen schipicoon op de GPS-locatie van die haven.
+
 ## Lokale ontwikkeling
 
 ```bash

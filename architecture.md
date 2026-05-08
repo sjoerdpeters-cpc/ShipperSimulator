@@ -23,6 +23,7 @@ src/
     economy/       Kosten, opbrengsten, brandstof en onderhoud
     events/        Spelgebeurtenissen
     map/           Kaarttypes, lagen en MapLibre-integratie
+    port/          Havens en startlocaties
     route/         Route-engine en routeplanning
     simulation/    Simulatietijd en voortgang
     vessel/        Schepen en eigenschappen
@@ -33,6 +34,7 @@ src/
 ## 4. Domeinmodules
 
 - `map`: beheert kaartconfiguratie, lagen en later MapLibre-componenten.
+- `port`: beschrijft havens, GPS-locaties, dieselprijs, ligkosten en aan/afmeerkosten.
 - `vessel`: beschrijft scheepstypes, snelheid, capaciteit en status.
 - `route`: berekent en valideert routes los van MapLibre.
 - `cargo`: levert vrachtopdrachten en contractinformatie.
@@ -68,8 +70,9 @@ De webapp is desktop-first, maar houdt rekening met latere PWA/mobile uitbreidin
 
 - MVP 0: technische basis, deployment, architectuur en kwaliteitschecks.
 - MVP 1: startschip kiezen met configureerbare scheepsdata en lokale foto's.
-- MVP 2: Nederlandse waterkaart.
-- MVP 3: schip en route kiezen met simulatie in realistisch aantal dagen.
+- MVP 2: startpunt op haven kiezen en schipicoon tonen op MapLibre-kaart.
+- MVP x: Nederlandse waterkaart.
+- MVP x: schip en route kiezen met simulatie in realistisch aantal dagen.
 - MVP 3: havens en vrachtopdrachten.
 - MVP 4: bruggen, sluizen en wachttijden.
 - MVP 5: geld, brandstof, onderhoud en planning.
