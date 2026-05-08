@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { ports } from '../data/ports';
 import { vessels } from '../data/vessels';
 import { PortMap } from '../domains/map/PortMap';
@@ -33,6 +33,7 @@ function getStatusLabel(status: FleetVesselStatus) {
 }
 
 export function App() {
+  const [isFleetPanelOpen, setFleetPanelOpen] = useState(false);
   const vessel = useGameStore((state) => state.vessel);
   const port = useGameStore((state) => state.port);
   const balanceEuros = useGameStore((state) => state.balanceEuros);
@@ -244,36 +245,37 @@ export function App() {
         <header className="top-app-bar" aria-label="Hoofdnavigatie">
           <div className="top-brand">
             <strong>Dutch Waterways</strong>
-            <nav aria-label="Modules">
-              <span>Overview</span>
-              <span data-active="true">Fleet</span>
-              <span>Contracts</span>
-              <span>Ports</span>
-              <span>Finances</span>
+            <nav aria-label="Modules" className="top-menu">
+              <button
+                className="top-menu-button"
+                data-active={isFleetPanelOpen}
+                onClick={() => setFleetPanelOpen(true)}
+                type="button"
+              >
+                Vloot
+              </button>
+              <span>Routes</span>
+              <span>Havens</span>
+              <span>Financien</span>
             </nav>
           </div>
+          <div className="simulation-controls" aria-label="Simulatie-acties">
+            <button data-selected={timeScale === 0} onClick={() => setTimeScale(0)} type="button">
+              Pauze
+            </button>
+            <button data-selected={timeScale === 1} onClick={() => setTimeScale(1)} type="button">
+              Normaal 1 dag/sec
+            </button>
+            <button data-selected={timeScale === 2} onClick={() => setTimeScale(2)} type="button">
+              Snel 2 dagen/sec
+            </button>
+          </div>
           <div className="top-status">
-            <span>Day {simulation.day}</span>
-            <span>{timeScale === 0 ? 'Paused' : `${timeScale}x simulation`}</span>
+            <span>{activeFleetVessel.name}</span>
+            <span>Dag {simulation.day}</span>
+            <span>{formatEuros(balanceEuros)}</span>
           </div>
         </header>
-
-        <aside className="side-nav" aria-label="Bedrijf en secties">
-          <div className="company-block">
-            <div className="company-mark">SW</div>
-            <div>
-              <strong>Shipper Works</strong>
-              <span>{activePort.name}, NL</span>
-            </div>
-          </div>
-          <nav>
-            <span data-active="true">Fleet</span>
-            <span>Logistics</span>
-            <span>Infrastructure</span>
-            <span>Financials</span>
-            <span>Company</span>
-          </nav>
-        </aside>
 
         <PortMap
           fullscreen
@@ -283,148 +285,134 @@ export function App() {
           vessel={activeFleetVessel.vessel}
         />
 
-        <section className="game-hud top-hud" aria-label="Spelstatus">
-          <div>
-            <span>Saldo</span>
-            <strong>{formatEuros(balanceEuros)}</strong>
-          </div>
-          <div>
-            <span>Dag</span>
-            <strong>{simulation.day}</strong>
-          </div>
-          <div>
-            <span>Tijd</span>
-            <strong>{timeScale === 0 ? 'Pauze' : `${timeScale}x`}</strong>
-          </div>
-        </section>
-
-        <aside className="fleet-panel" aria-label="Vlootbeheer">
-          <div className="panel-heading">
-            <span>Fleet Management</span>
-            <h1>{activeFleetVessel.vessel.name}</h1>
-          </div>
-
-          <div className="fleet-list">
-            {fleet.map((fleetVessel) => (
+        {isFleetPanelOpen ? (
+          <aside className="fleet-panel" aria-label="Vlootbeheer">
+            <div className="panel-heading">
+              <div>
+                <span>Vlootbeheer</span>
+                <h1>{activeFleetVessel.name}</h1>
+              </div>
               <button
-                className="fleet-button"
-                data-selected={fleetVessel.id === activeFleetVessel.id}
-                key={fleetVessel.id}
-                onClick={() => setActiveFleetVessel(fleetVessel.id)}
+                className="drawer-close"
+                onClick={() => setFleetPanelOpen(false)}
                 type="button"
+                aria-label="Sluit vlootdetails"
               >
-                <span>{fleetVessel.vessel.label}</span>
-                <strong>{fleetVessel.vessel.name}</strong>
-              </button>
-            ))}
-          </div>
-
-          <section className="status-panel">
-            <h2>{activeFleetVessel.vessel.name}</h2>
-            <dl>
-              <div>
-                <dt>Thuishaven</dt>
-                <dd>{ports.find((candidate) => candidate.id === activeFleetVessel.homePortId)?.name}</dd>
-              </div>
-              <div>
-                <dt>Ligplaats</dt>
-                <dd>{activePort.name}</dd>
-              </div>
-              <div>
-                <dt>Status</dt>
-                <dd>{getStatusLabel(activeFleetVessel.status)}</dd>
-              </div>
-              {activeFleetVessel.voyage ? (
-                <>
-                  <div>
-                    <dt>Afstand</dt>
-                    <dd>{activeFleetVessel.voyage.distanceKm} km</dd>
-                  </div>
-                  <div>
-                    <dt>Voortgang</dt>
-                    <dd>
-                      Dag {activeFleetVessel.voyage.progressDays} /{' '}
-                      {activeFleetVessel.voyage.durationDays}
-                    </dd>
-                  </div>
-                </>
-              ) : null}
-              <div>
-                <dt>Brandstof</dt>
-                <dd>
-                  {Math.round(activeFleetVessel.fuelLiters)} /{' '}
-                  {activeFleetVessel.vessel.fuelCapacityLiters} l
-                </dd>
-              </div>
-              <div>
-                <dt>Bestemming</dt>
-                <dd>{destinationPort?.name ?? 'Geen'}</dd>
-              </div>
-              {plannedRoute ? (
-                <>
-                  <div>
-                    <dt>Route</dt>
-                    <dd>{plannedRoute.distanceKm} km</dd>
-                  </div>
-                  <div>
-                    <dt>Vaartijd</dt>
-                    <dd>{plannedRoute.durationDays} dagen</dd>
-                  </div>
-                </>
-              ) : null}
-            </dl>
-          </section>
-
-          <section className="action-panel" aria-label="Scheepsacties">
-            <h2>Acties</h2>
-            <button type="button" onClick={() => bunkerActiveVessel(activePort)}>
-              Bunkeren
-            </button>
-            <label>
-              Route kiezen
-              <select
-                disabled={activeFleetVessel.status === 'sailing'}
-                onChange={(event) => planRouteForActiveVessel(event.target.value)}
-                value={activeFleetVessel.destinationPortId ?? ''}
-              >
-                <option value="" disabled>
-                  Kies bestemming
-                </option>
-                {ports
-                  .filter((candidate) => candidate.id !== activePort.id)
-                  .map((candidate) => (
-                    <option key={candidate.id} value={candidate.id}>
-                      {candidate.name}
-                    </option>
-                  ))}
-              </select>
-            </label>
-            <button disabled={!canStartSailing} type="button" onClick={startSailingActiveVessel}>
-              Start varen
-            </button>
-            <button type="button" onClick={idleActiveVessel}>
-              Laat liggen
-            </button>
-          </section>
-
-          <section className="time-panel" aria-label="Tijdsimulatie">
-            <h2>Tijd</h2>
-            <div className="segmented-controls">
-              <button data-selected={timeScale === 0} onClick={() => setTimeScale(0)} type="button">
-                Pauze
-              </button>
-              <button data-selected={timeScale === 1} onClick={() => setTimeScale(1)} type="button">
-                1 dag/sec
-              </button>
-              <button data-selected={timeScale === 2} onClick={() => setTimeScale(2)} type="button">
-                2 dagen/sec
+                Sluiten
               </button>
             </div>
-            <button type="button" onClick={() => tick(1)}>
-              Simuleer 1 dag
-            </button>
-          </section>
-        </aside>
+
+            <div className="fleet-list">
+              {fleet.map((fleetVessel) => (
+                <button
+                  className="fleet-button"
+                  data-selected={fleetVessel.id === activeFleetVessel.id}
+                  key={fleetVessel.id}
+                  onClick={() => setActiveFleetVessel(fleetVessel.id)}
+                  type="button"
+                >
+                  <span>{fleetVessel.vessel.label}</span>
+                  <strong>{fleetVessel.name}</strong>
+                </button>
+              ))}
+            </div>
+
+            <section className="status-panel">
+              <h2>{activeFleetVessel.name}</h2>
+              <dl>
+                <div>
+                  <dt>Schiptype</dt>
+                  <dd>{activeFleetVessel.vessel.name}</dd>
+                </div>
+                <div>
+                  <dt>Thuishaven</dt>
+                  <dd>{ports.find((candidate) => candidate.id === activeFleetVessel.homePortId)?.name}</dd>
+                </div>
+                <div>
+                  <dt>Ligplaats</dt>
+                  <dd>{activePort.name}</dd>
+                </div>
+                <div>
+                  <dt>Status</dt>
+                  <dd>{getStatusLabel(activeFleetVessel.status)}</dd>
+                </div>
+                {activeFleetVessel.voyage ? (
+                  <>
+                    <div>
+                      <dt>Afstand</dt>
+                      <dd>{activeFleetVessel.voyage.distanceKm} km</dd>
+                    </div>
+                    <div>
+                      <dt>Voortgang</dt>
+                      <dd>
+                        Dag {activeFleetVessel.voyage.progressDays} /{' '}
+                        {activeFleetVessel.voyage.durationDays}
+                      </dd>
+                    </div>
+                  </>
+                ) : null}
+                <div>
+                  <dt>Brandstof</dt>
+                  <dd>
+                    {Math.round(activeFleetVessel.fuelLiters)} /{' '}
+                    {activeFleetVessel.vessel.fuelCapacityLiters} l
+                  </dd>
+                </div>
+                <div>
+                  <dt>Bestemming</dt>
+                  <dd>{destinationPort?.name ?? 'Geen'}</dd>
+                </div>
+                {plannedRoute ? (
+                  <>
+                    <div>
+                      <dt>Route</dt>
+                      <dd>{plannedRoute.distanceKm} km</dd>
+                    </div>
+                    <div>
+                      <dt>Vaartijd</dt>
+                      <dd>{plannedRoute.durationDays} dagen</dd>
+                    </div>
+                  </>
+                ) : null}
+              </dl>
+            </section>
+
+            <section className="action-panel" aria-label="Scheepsacties">
+              <h2>Acties</h2>
+              <button type="button" onClick={() => bunkerActiveVessel(activePort)}>
+                Bunkeren
+              </button>
+              <label>
+                Route kiezen
+                <select
+                  disabled={activeFleetVessel.status === 'sailing'}
+                  onChange={(event) => planRouteForActiveVessel(event.target.value)}
+                  value={activeFleetVessel.destinationPortId ?? ''}
+                >
+                  <option value="" disabled>
+                    Kies bestemming
+                  </option>
+                  {ports
+                    .filter((candidate) => candidate.id !== activePort.id)
+                    .map((candidate) => (
+                      <option key={candidate.id} value={candidate.id}>
+                        {candidate.name}
+                      </option>
+                    ))}
+                </select>
+              </label>
+              <button disabled={!canStartSailing} type="button" onClick={startSailingActiveVessel}>
+                Start varen
+              </button>
+              <button type="button" onClick={idleActiveVessel}>
+                Laat liggen
+              </button>
+              <button type="button" onClick={() => tick(1)}>
+                Simuleer 1 dag
+              </button>
+            </section>
+          </aside>
+        ) : null}
       </main>
     );
   }

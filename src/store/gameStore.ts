@@ -55,6 +55,7 @@ export const useGameStore = create<GameStore>((set) => ({
 
       const fleetVessel: FleetVessel = {
         id: `${state.vessel.id}-${Date.now()}`,
+        name: `${state.vessel.name} ${state.fleet.length + 1}`,
         vessel: state.vessel,
         homePortId: state.port.id,
         currentPortId: state.port.id,

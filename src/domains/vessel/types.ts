@@ -31,6 +31,7 @@ export type FleetVesselStatus = 'idle' | 'bunkering' | 'route-planned' | 'sailin
 
 export type FleetVessel = {
   id: string;
+  name: string;
   vessel: Vessel;
   homePortId: string;
   currentPortId: string;
