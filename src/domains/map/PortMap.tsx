@@ -11,28 +11,22 @@ type PortMapProps = {
   shipCoordinate?: [longitude: number, latitude: number];
 };
 
-const osmRasterStyle: maplibregl.StyleSpecification = {
+const darkMapStyle: maplibregl.StyleSpecification = {
   version: 8,
   sources: {
-    osm: {
+    carto: {
       type: 'raster',
       tiles: [
-        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-        'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+        'https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+        'https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
       ],
-      tileSize: 256,
-      attribution: 'OpenStreetMap contributors',
+      tileSize: 512,
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>',
+      maxzoom: 20,
     },
   },
-  layers: [
-    {
-      id: 'osm',
-      type: 'raster',
-      source: 'osm',
-    },
-  ],
+  layers: [{ id: 'carto', type: 'raster', source: 'carto' }],
 };
 
 export function PortMap({
@@ -61,7 +55,7 @@ export function PortMap({
     try {
       mapRef.current = new maplibregl.Map({
         container: containerRef.current,
-        style: osmRasterStyle,
+        style: darkMapStyle,
         center: port.coordinates,
         zoom: 11,
       });
@@ -178,9 +172,10 @@ export function PortMap({
         type: 'line',
         source: 'active-voyage-route',
         paint: {
-          'line-color': '#176b78',
-          'line-width': 5,
-          'line-opacity': 0.78,
+          'line-color': '#1eabd0',
+          'line-width': 2,
+          'line-opacity': 0.9,
+          'line-dasharray': [5, 4],
         },
       });
 

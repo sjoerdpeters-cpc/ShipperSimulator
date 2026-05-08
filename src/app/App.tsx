@@ -334,7 +334,7 @@ export function App() {
                 </div>
                 <div>
                   <dt>Status</dt>
-                  <dd>{getStatusLabel(activeFleetVessel.status)}</dd>
+                  <dd data-status={activeFleetVessel.status}>{getStatusLabel(activeFleetVessel.status)}</dd>
                 </div>
                 {activeFleetVessel.voyage ? (
                   <>
