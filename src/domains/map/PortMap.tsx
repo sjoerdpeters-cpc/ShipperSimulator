@@ -11,6 +11,22 @@ type PortMapProps = {
   shipCoordinate?: [longitude: number, latitude: number];
 };
 
+const VESSEL_COLORS: Record<string, string> = {
+  container:   '#1eabd0',
+  tanker:      '#6ab0d4',
+  'dry-cargo': '#c8a040',
+  'push-boat': '#e07840',
+};
+
+function shipSvg(color: string) {
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="28" viewBox="0 0 20 28">` +
+    `<polygon points="10,1 19,25 10,20 1,25" fill="${color}" ` +
+    `stroke="rgba(0,0,0,0.55)" stroke-width="1.5" stroke-linejoin="round"/>` +
+    `</svg>`
+  );
+}
+
 const darkMapStyle: maplibregl.StyleSpecification = {
   version: 8,
   sources: {
@@ -68,7 +84,13 @@ export function PortMap({
         new maplibregl.NavigationControl({ showCompass: false }),
         'top-right',
       );
-      mapRef.current.on('error', reportMapError);
+      mapRef.current.on('error', ({ error }) => {
+        // Tile/source HTTP errors are transient — only fatal (non-HTTP) errors
+        // should replace the map with the fallback view.
+        if (!error || !('status' in error)) {
+          reportMapError();
+        }
+      });
       mapRef.current.once('load', () => {
         mapRef.current?.resize();
       });
@@ -107,11 +129,12 @@ export function PortMap({
       if (!markerRef.current) {
         const markerElement = document.createElement('div');
         markerElement.className = 'ship-marker';
-
         markerRef.current = new maplibregl.Marker({ element: markerElement, anchor: 'center' }).addTo(map);
       }
 
       const markerElement = markerRef.current.getElement();
+      const color = VESSEL_COLORS[vessel.type] ?? '#1eabd0';
+      markerElement.innerHTML = shipSvg(color);
       markerElement.dataset.vesselType = vessel.type;
       markerElement.setAttribute('aria-label', `${vessel.name} in ${port.name}`);
       markerElement.title = `${vessel.name} - ${port.name}`;
