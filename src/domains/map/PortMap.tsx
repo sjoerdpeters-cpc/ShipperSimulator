@@ -43,10 +43,14 @@ export function PortMap({
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const [mapError, setMapError] = useState(false);
   const activeCoordinate = shipCoordinate ?? port.coordinates;
+  // Capture the vessel's actual position at mount so the map starts there.
+  const initialCenter = useRef<[number, number]>(activeCoordinate);
   const reportMapError = () => {
     window.setTimeout(() => setMapError(true), 0);
   };
 
+  // Create the map exactly once. All position/route updates are handled by the
+  // effects below so we never need to destroy and recreate it on vessel changes.
   useEffect(() => {
     if (!containerRef.current || mapRef.current) {
       return;
@@ -56,7 +60,7 @@ export function PortMap({
       mapRef.current = new maplibregl.Map({
         container: containerRef.current,
         style: darkMapStyle,
-        center: port.coordinates,
+        center: initialCenter.current,
         zoom: 11,
       });
 
@@ -85,7 +89,8 @@ export function PortMap({
       resizeObserverRef.current?.disconnect();
       resizeObserverRef.current = null;
     };
-  }, [port.coordinates]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const map = mapRef.current;
