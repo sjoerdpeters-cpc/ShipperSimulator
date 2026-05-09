@@ -13,11 +13,19 @@ npm run preview    # Preview production build locally
 
 CI runs on every push/PR to `main`: lint → build (Node 24). Vercel auto-deploys `main` from `dist/`.
 
+There is no test runner configured. Validate changes with `npm run lint` and `npm run build`; for UI or map changes also run `npm run preview` and verify the app loads. If tests are added later, name them `{feature}.test.ts`.
+
+## Commit style
+
+Short imperative messages, one user-visible change or one technical fix per commit (e.g. `Simplify map shell navigation`). UI changes should note whether they were verified in Vercel.
+
 ## Architecture
 
 **Shipper Simulator** is a browser-based Dutch inland waterways (binnenvaart) shipping game. Players manage a fleet of vessels, plan routes between 12 Dutch ports, and simulate sailing across the waterway network. All data is bundled locally — no backend or API.
 
-Stack: React 18 + TypeScript, Vite, Zustand (state), MapLibre GL (map), custom CSS design tokens.
+Stack: React 18 + TypeScript, Vite, Zustand (state), MapLibre GL (map), custom CSS design tokens. TypeScript uses `strict: true` and `noEmit: true` — Vite handles transpilation, `tsc` is type-check only.
+
+`inputdoc/` contains reference material and design notes; it is not runtime code.
 
 ### State: `src/store/gameStore.ts`
 
@@ -28,6 +36,8 @@ Single Zustand store is the source of truth for all game state:
 - `activeFleetVesselId` — currently selected vessel
 - `simulation` — day counter + elapsed hours
 - `timeScale` — 0 (paused) / 1 / 2 days per second
+
+**FleetVessel runtime details:** ID is `{vessel.id}-{Date.now()}`, fuel initialises at 35% of capacity. `FleetVesselStatus` is `'idle' | 'bunkering' | 'route-planned' | 'sailing'`. `BUNKER_LITERS_PER_ACTION = 1000` liters, capped at vessel capacity.
 
 ### Game Flow
 
@@ -60,7 +70,7 @@ Fuel estimation: `distanceKm × (costPerKmEuros / 10)` liters. Fuel is deducted 
 
 ### UI: `src/app/App.tsx`
 
-Single file (~420 lines) manages all screens. Main game screen:
+Single file (~420 lines) manages all screens. No custom hooks or context providers — Zustand store is global. Main game screen:
 - **Top bar:** brand, time controls (Pause/1×/2×), status (name/day/balance)
 - **Map:** `PortMap` component — OSM raster tiles, ship marker (`data-vessel-type` for CSS), destination flag, GeoJSON route line, dynamic zoom (8 for voyage, 11 for port)
 - **Fleet panel (sidebar):** vessel list, stats, action buttons (Bunker, Plan Route, Sail, Idle), route/fuel details
@@ -69,7 +79,7 @@ Single file (~420 lines) manages all screens. Main game screen:
 
 ### Styling: `src/styles/global.css`
 
-CSS-first with design tokens (`--primary`, `--accent`, `--surface`, etc.). All UI text and port names are in Dutch.
+CSS-first with design tokens (`--primary`, `--accent`, `--surface`, etc.). Single global stylesheet — no CSS Modules or Tailwind. All UI text and port names are in Dutch. Code style: 2-space indent, semicolons, single quotes.
 
 ## Key Conventions
 
@@ -77,4 +87,4 @@ CSS-first with design tokens (`--primary`, `--accent`, `--surface`, etc.). All U
 - Vessel auto-naming: `{VesselName} {fleetIndex + 1}` (e.g., "Rijn Container 1").
 - Fleet updates use Zustand spread-immutability patterns.
 - New domains go in `src/domains/{name}/` — add types first, then logic, then expose via store actions.
-- Port imagery lives in `public/assets/ports/`.
+- Port imagery lives in `public/assets/ports/`; vessel imagery in `public/assets/vessels/`.
